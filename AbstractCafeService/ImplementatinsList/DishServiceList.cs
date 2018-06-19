@@ -4,6 +4,7 @@ using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AbstractCafeService.ImplementatinsList
 {
@@ -18,48 +19,38 @@ namespace AbstractCafeService.ImplementatinsList
 
         public List<DishViewModel> GetList()
         {
-            List<DishViewModel> result = new List<DishViewModel>();
-            for (int i = 0; i < source.Dishs.Count; ++i)
-            {
-                result.Add(new DishViewModel
+            List<DishViewModel> result = source.Dishs
+                .Select(rec => new DishViewModel
                 {
-                    Id = source.Dishs[i].Id,
-                    DishName = source.Dishs[i].DishName
-                });
-            }
+                    Id = rec.Id,
+                    DishName = rec.DishName
+                })
+                .ToList();
             return result;
         }
 
         public DishViewModel GetElement(int id)
         {
-            for (int i = 0; i < source.Dishs.Count; ++i)
+            Dish element = source.Dishs.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Dishs[i].Id == id)
+                return new DishViewModel
                 {
-                    return new DishViewModel
-                    {
-                        Id = source.Dishs[i].Id,
-                        DishName = source.Dishs[i].DishName
-                    };
-                }
+                    Id = element.Id,
+                    DishName = element.DishName
+                };
             }
             throw new Exception("Элемент не найден");
         }
 
         public void AddElement(DishBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Dishs.Count; ++i)
+            Dish element = source.Dishs.FirstOrDefault(rec => rec.DishName == model.DishName);
+            if (element != null)
             {
-                if (source.Dishs[i].Id > maxId)
-                {
-                    maxId = source.Dishs[i].Id;
-                }
-                if (source.Dishs[i].DishName == model.DishName)
-                {
-                    throw new Exception("Уже есть компонент с таким названием");
-                }
+                throw new Exception("Уже есть блюдо с таким названием");
             }
+            int maxId = source.Dishs.Count > 0 ? source.Dishs.Max(rec => rec.Id) : 0;
             source.Dishs.Add(new Dish
             {
                 Id = maxId + 1,
@@ -69,37 +60,31 @@ namespace AbstractCafeService.ImplementatinsList
 
         public void UpdElement(DishBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Dishs.Count; ++i)
+            Dish element = source.Dishs.FirstOrDefault(rec =>
+                                        rec.DishName == model.DishName && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.Dishs[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.Dishs[i].DishName == model.DishName &&
-                    source.Dishs[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть компонент с таким названием");
-                }
+                throw new Exception("Уже есть ингредиент с таким названием");
             }
-            if (index == -1)
+            element = source.Dishs.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Dishs[index].DishName = model.DishName;
+            element.DishName = model.DishName;
         }
 
         public void DelElement(int id)
         {
-            for (int i = 0; i < source.Dishs.Count; ++i)
+            Dish element = source.Dishs.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.Dishs[i].Id == id)
-                {
-                    source.Dishs.RemoveAt(i);
-                    return;
-                }
+                source.Dishs.Remove(element);
             }
-            throw new Exception("Элемент не найден");
+            else
+            {
+                throw new Exception("Элемент не найден");
+            }
         }
     }
 }

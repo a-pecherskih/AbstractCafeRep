@@ -4,6 +4,7 @@ using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AbstractCafeService.ImplementatinsList
 {
@@ -18,68 +19,32 @@ namespace AbstractCafeService.ImplementatinsList
 
         public List<ChoiceViewModel> GetList()
         {
-            List<ChoiceViewModel> result = new List<ChoiceViewModel>();
-            for (int i = 0; i < source.Choices.Count; ++i)
-            {
-                string customerFIO = string.Empty;
-                for (int j = 0; j < source.Customers.Count; ++j)
+            List<ChoiceViewModel> result = source.Choices
+                .Select(rec => new ChoiceViewModel
                 {
-                    if (source.Customers[j].Id == source.Choices[i].CustomerId)
-                    {
-                        customerFIO = source.Customers[j].CustomerFIO;
-                        break;
-                    }
-                }
-                string menuName = string.Empty;
-                for (int j = 0; j < source.Menus.Count; ++j)
-                {
-                    if (source.Menus[j].Id == source.Menus[i].Id)
-                    {
-                        menuName = source.Menus[j].MenuName;
-                        break;
-                    }
-                }
-                string chefFIO = string.Empty;
-                if (source.Choices[i].ChefId.HasValue)
-                {
-                    for (int j = 0; j < source.Chefs.Count; ++j)
-                    {
-                        if (source.Chefs[j].Id == source.Choices[i].ChefId.Value)
-                        {
-                            chefFIO = source.Chefs[j].ChefFIO;
-                            break;
-                        }
-                    }
-                }
-                result.Add(new ChoiceViewModel
-                {
-                    Id = source.Choices[i].Id,
-                    CustomerId = source.Choices[i].CustomerId,
-                    CustomerFIO = customerFIO,
-                    MenuId = source.Choices[i].MenuId,
-                    MenuName = menuName,
-                    ChefId = source.Choices[i].ChefId,
-                    ChefName = chefFIO,
-                    Count = source.Choices[i].Count,
-                    Sum = source.Choices[i].Sum,
-                    DateCreate = source.Choices[i].DateCreate.ToLongDateString(),
-                    DateImplement = source.Choices[i].DateImplement?.ToLongDateString(),
-                    Status = source.Choices[i].Status.ToString()
-                });
-            }
+                    Id = rec.Id,
+                    CustomerId = rec.CustomerId,
+                    MenuId = rec.MenuId,
+                    ChefId = rec.ChefId,
+                    DateCreate = rec.DateCreate.ToLongDateString(),
+                    DateImplement = rec.DateImplement?.ToLongDateString(),
+                    Status = rec.Status.ToString(),
+                    Count = rec.Count,
+                    Sum = rec.Sum,
+                    CustomerFIO = source.Customers
+                                    .FirstOrDefault(recC => recC.Id == rec.CustomerId)?.CustomerFIO,
+                    MenuName = source.Menus
+                                    .FirstOrDefault(recP => recP.Id == rec.MenuId)?.MenuName,
+                    ChefName = source.Chefs
+                                    .FirstOrDefault(recI => recI.Id == rec.ChefId)?.ChefFIO
+                })
+                .ToList();
             return result;
         }
 
         public void CreateChoice(ChoiceBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Choices.Count; ++i)
-            {
-                if (source.Choices[i].Id > maxId)
-                {
-                    maxId = source.Customers[i].Id;
-                }
-            }
+            int maxId = source.Choices.Count > 0 ? source.Choices.Max(rec => rec.Id) : 0;
             source.Choices.Add(new Choice
             {
                 Id = maxId + 1,
@@ -94,134 +59,92 @@ namespace AbstractCafeService.ImplementatinsList
 
         public void TakeChoiceInWork(ChoiceBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Choices.Count; ++i)
-            {
-                if (source.Choices[i].Id == model.Id)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1)
+            Choice element = source.Choices.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            // смотрим по количеству компонентов на складах
-            for (int i = 0; i < source.MenuDishs.Count; ++i)
+
+            var menuDishs = source.MenuDishs.Where(rec => rec.MenuId == element.MenuId);
+            foreach (var menuDish in menuDishs)
             {
-                if (source.MenuDishs[i].MenuId == source.Choices[index].MenuId)
+                int countOnKitchens = source.KitchenDishs
+                                            .Where(rec => rec.DishId == menuDish.DishId)
+                                            .Sum(rec => rec.Count);
+                if (countOnKitchens < menuDish.Count * element.Count)
                 {
-                    int countOnKitchens = 0;
-                    for (int j = 0; j < source.KitchenDishs.Count; ++j)
+                    var dishName = source.Dishs
+                                    .FirstOrDefault(rec => rec.Id == menuDish.DishId);
+                    throw new Exception("Недостаточно ингредиентов " + dishName?.DishName +
+                        " требуется " + menuDish.Count + ", в наличии " + countOnKitchens);
+                }
+            }
+
+            foreach (var menuDish in menuDishs)
+            {
+                int countOnKitchens = menuDish.Count * element.Count;
+                var kitchenDishs = source.KitchenDishs
+                                            .Where(rec => rec.DishId == menuDish.DishId);
+                foreach (var kitchenDish in kitchenDishs)
+                {
+
+                    if (kitchenDish.Count >= countOnKitchens)
                     {
-                        if (source.KitchenDishs[j].DishId == source.MenuDishs[i].DishId)
-                        {
-                            countOnKitchens += source.KitchenDishs[j].Count;
-                        }
+                        kitchenDish.Count -= countOnKitchens;
+                        break;
                     }
-                    if (countOnKitchens < source.MenuDishs[i].Count)
+                    else
                     {
-                        for (int j = 0; j < source.Dishs.Count; ++j)
-                        {
-                            if (source.Dishs[j].Id == source.MenuDishs[i].DishId)
-                            {
-                                throw new Exception("Не достаточно компонента " + source.Dishs[j].DishName +
-                                    " требуется " + source.MenuDishs[i].Count + ", в наличии " + countOnKitchens);
-                            }
-                        }
+                        countOnKitchens -= kitchenDish.Count;
+                        kitchenDish.Count = 0;
                     }
                 }
             }
-            // списываем
-            for (int i = 0; i < source.MenuDishs.Count; ++i)
-            {
-                if (source.MenuDishs[i].MenuId == source.Choices[index].MenuId)
-                {
-                    int countOnKitchens = source.MenuDishs[i].Count;
-                    for (int j = 0; j < source.KitchenDishs.Count; ++j)
-                    {
-                        if (source.KitchenDishs[j].DishId == source.KitchenDishs[i].DishId)
-                        {
-                            // компонентов на одном слкаде может не хватать
-                            if (source.KitchenDishs[j].Count >= countOnKitchens)
-                            {
-                                source.KitchenDishs[j].Count -= countOnKitchens;
-                                break;
-                            }
-                            else
-                            {
-                                countOnKitchens -= source.KitchenDishs[j].Count;
-                                source.KitchenDishs[j].Count = 0;
-                            }
-                        }
-                    }
-                }
-            }
-            source.Choices[index].ChefId = model.ChefId;
-            source.Choices[index].DateImplement = DateTime.Now;
-            source.Choices[index].Status = ChoiceStatus.Готовится;
+            element.ChefId = model.ChefId;
+            element.DateImplement = DateTime.Now;
+            element.Status = ChoiceStatus.Готовится;
         }
 
         public void FinishChoice(int id)
         {
-            int index = -1;
-            for (int i = 0; i < source.Choices.Count; ++i)
-            {
-                if (source.Customers[i].Id == id)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1)
+            Choice element = source.Choices.FirstOrDefault(rec => rec.Id == id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Choices[index].Status = ChoiceStatus.Готов;
+            element.Status = ChoiceStatus.Готов;
         }
 
         public void PayChoice(int id)
         {
-            int index = -1;
-            for (int i = 0; i < source.Choices.Count; ++i)
-            {
-                if (source.Customers[i].Id == id)
-                {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1)
+            Choice element = source.Choices.FirstOrDefault(rec => rec.Id == id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Choices[index].Status = ChoiceStatus.Оплачен;
+            element.Status = ChoiceStatus.Оплачен;
         }
 
         public void PutDishOnKitchen(KitchenDishBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.KitchenDishs.Count; ++i)
+            KitchenDish element = source.KitchenDishs
+                                                .FirstOrDefault(rec => rec.KitchenId == model.KitchenId &&
+                                                                    rec.DishId == model.DishId);
+            if (element != null)
             {
-                if (source.KitchenDishs[i].KitchenId == model.KitchenId &&
-                    source.KitchenDishs[i].DishId == model.DishId)
-                {
-                    source.KitchenDishs[i].Count += model.Count;
-                    return;
-                }
-                if (source.KitchenDishs[i].Id > maxId)
-                {
-                    maxId = source.KitchenDishs[i].Id;
-                }
+                element.Count += model.Count;
             }
-            source.KitchenDishs.Add(new KitchenDish
+            else
             {
-                Id = ++maxId,
-                KitchenId = model.KitchenId,
-                DishId = model.DishId,
-                Count = model.Count
-            });
+                int maxId = source.KitchenDishs.Count > 0 ? source.KitchenDishs.Max(rec => rec.Id) : 0;
+                source.KitchenDishs.Add(new KitchenDish
+                {
+                    Id = ++maxId,
+                    KitchenId = model.KitchenId,
+                    DishId = model.DishId,
+                    Count = model.Count
+                });
+            }
         }
     }
 }
