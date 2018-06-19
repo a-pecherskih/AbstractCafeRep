@@ -1,4 +1,5 @@
-﻿using AbstractCafeService.BindingModel;
+﻿using AbstractCafeRestApi.Services;
+using AbstractCafeService.BindingModel;
 using AbstractCafeService.Interfaces;
 using System;
 using System.Web.Http;
@@ -53,6 +54,18 @@ namespace AbstractCafeRestApi.Controllers
         public void PutDishOnKitchen(KitchenDishBindingModel model)
         {
             _service.PutDishOnKitchen(model);
+        }
+
+        [HttpGet]
+        public IHttpActionResult GetInfo()
+        {
+            ReflectionService service = new ReflectionService();
+            var list = service.GetInfoByAssembly();
+            if (list == null)
+            {
+                InternalServerError(new Exception("Нет данных"));
+            }
+            return Ok(list);
         }
     }
 }
