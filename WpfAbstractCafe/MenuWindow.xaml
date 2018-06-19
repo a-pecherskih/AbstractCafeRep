@@ -1,0 +1,25 @@
+﻿<Window x:Class="WpfAbstractCafe.MenuWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfAbstractCafe"
+        mc:Ignorable="d"
+        Title="Меню" Height="372.28" Width="498.627">
+    <Grid>
+        <Label Content="Название: " HorizontalAlignment="Left" Margin="18,10,0,0" VerticalAlignment="Top" Height="26" Width="74"/>
+        <TextBox x:Name="textBoxName" HorizontalAlignment="Left" Height="23" Margin="97,13,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196"/>
+        <Label Content="Цена:" HorizontalAlignment="Left" Margin="18,46,0,0" VerticalAlignment="Top" Height="26" Width="38"/>
+        <TextBox x:Name="textBoxPrice" HorizontalAlignment="Left" Height="23" Margin="97,52,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="196"/>
+        <GroupBox Header="Блюда" HorizontalAlignment="Left" Height="216" Margin="19,75,0,0" VerticalAlignment="Top" Width="442">
+            <DataGrid x:Name="dataGridView" HorizontalAlignment="Left" Height="182" Margin="9,8,0,0" VerticalAlignment="Top" Width="297"/>
+        </GroupBox>
+        <Button x:Name="buttonAdd" Content="Добавить" HorizontalAlignment="Left" Margin="354,107,0,0" VerticalAlignment="Top" Width="90" Click="buttonAdd_Click"/>
+        <Button x:Name="buttonUpd" Content="Изменить" HorizontalAlignment="Left" Margin="354,145,0,0" VerticalAlignment="Top" Width="90" Click="buttonUpd_Click"/>
+        <Button x:Name="buttonDel" Content="Удалить" HorizontalAlignment="Left" Margin="354,183,0,0" VerticalAlignment="Top" Width="90" Click="buttonDel_Click"/>
+        <Button x:Name="buttonRef" Content="Обновить" HorizontalAlignment="Left" Margin="354,223,0,0" VerticalAlignment="Top" Width="90" Click="buttonRef_Click"/>
+        <Button x:Name="buttonSave" Content="Сохранить" HorizontalAlignment="Left" Margin="257,311,0,0" VerticalAlignment="Top" Width="90" Click="buttonSave_Click"/>
+        <Button x:Name="buttonCancel" Content="Отмена" HorizontalAlignment="Left" Margin="371,311,0,0" VerticalAlignment="Top" Width="90" Click="buttonCancel_Click"/>
+
+    </Grid>
+</Window>

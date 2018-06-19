@@ -91,9 +91,9 @@
     <Compile Include="Interfaces\IKitchenService.cs" />
     <Compile Include="Interfaces\IMainService.cs" />
     <Compile Include="Interfaces\IMenuService.cs" />
-    <Compile Include="Migrations\201806191341552_FirstMigration.cs" />
-    <Compile Include="Migrations\201806191341552_FirstMigration.Designer.cs">
-      <DependentUpon>201806191341552_FirstMigration.cs</DependentUpon>
+    <Compile Include="Migrations\201806191331100_FirstMigration.cs" />
+    <Compile Include="Migrations\201806191331100_FirstMigration.Designer.cs">
+      <DependentUpon>201806191331100_FirstMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -128,8 +128,8 @@
     <Folder Include="Microsoft\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201806191341552_FirstMigration.resx">
-      <DependentUpon>201806191341552_FirstMigration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201806191331100_FirstMigration.resx">
+      <DependentUpon>201806191331100_FirstMigration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
