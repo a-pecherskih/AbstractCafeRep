@@ -2,6 +2,7 @@
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AbstractCafeView
@@ -26,25 +27,21 @@ namespace AbstractCafeView
                     MessageBox.Show("Не указан заказ", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
                 }
-                var response = APIClient.GetRequest("api/Chef/GetList");
-                if (response.Result.IsSuccessStatusCode)
+                List<ChefViewModel> list = Task.Run(() => APIClient.GetRequestData<List<ChefViewModel>>("api/Chef/GetList")).Result;
+                if (list != null)
                 {
-                    List<ChefViewModel> list = APIClient.GetElement<List<ChefViewModel>>(response);
-                    if (list != null)
-                    {
-                        comboBoxChef.DisplayMember = "ChefFIO";
-                        comboBoxChef.ValueMember = "Id";
-                        comboBoxChef.DataSource = list;
-                        comboBoxChef.SelectedItem = null;
-                    }
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(response));
+                    comboBoxChef.DisplayMember = "ChefFIO";
+                    comboBoxChef.ValueMember = "Id";
+                    comboBoxChef.DataSource = list;
+                    comboBoxChef.SelectedItem = null;
                 }
             }
             catch (Exception ex)
             {
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -58,31 +55,39 @@ namespace AbstractCafeView
             }
             try
             {
-                var response = APIClient.PostRequest("api/Main/TakeChoiceInWork", new ChoiceBindingModel
+                int chefId = Convert.ToInt32(comboBoxChef.SelectedValue);
+                Task task = Task.Run(() => APIClient.PostRequestData("api/Main/TakeChoiceInWork", new ChoiceBindingModel
                 {
                     Id = id.Value,
-                    ChefId = Convert.ToInt32(comboBoxChef.SelectedValue)
-                });
-                if (response.Result.IsSuccessStatusCode)
+                    ChefId = chefId
+                }));
+
+                task.ContinueWith((prevTask) => MessageBox.Show("Заказ передан в работу. Обновите список", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information),
+                    TaskContinuationOptions.OnlyOnRanToCompletion);
+                task.ContinueWith((prevTask) =>
                 {
-                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    DialogResult = DialogResult.OK;
-                    Close();
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(response));
-                }
+                    var ex = (Exception)prevTask.Exception;
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                    }
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }, TaskContinuationOptions.OnlyOnFaulted);
+
+                Close();
             }
             catch (Exception ex)
             {
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
             Close();
         }
     }

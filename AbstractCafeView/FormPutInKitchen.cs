@@ -2,6 +2,7 @@
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AbstractCafeView
@@ -17,41 +18,31 @@ namespace AbstractCafeView
         {
             try
             {
-                var responseC = APIClient.GetRequest("api/Dish/GetList");
-                if (responseC.Result.IsSuccessStatusCode)
+
+                List<DishViewModel> listD = Task.Run(() => APIClient.GetRequestData<List<DishViewModel>>("api/Dish/GetList")).Result;
+                if (listD != null)
                 {
-                    List<DishViewModel> list = APIClient.GetElement<List<DishViewModel>>(responseC);
-                    if (list != null)
-                    {
-                        comboBoxDish.DisplayMember = "DishName";
-                        comboBoxDish.ValueMember = "Id";
-                        comboBoxDish.DataSource = list;
-                        comboBoxDish.SelectedItem = null;
-                    }
+                    comboBoxDish.DisplayMember = "DishName";
+                    comboBoxDish.ValueMember = "Id";
+                    comboBoxDish.DataSource = listD;
+                    comboBoxDish.SelectedItem = null;
                 }
-                else
+
+                List<KitchenViewModel> listK = Task.Run(() => APIClient.GetRequestData<List<KitchenViewModel>>("api/Kitchen/GetList")).Result;
+                if (listK != null)
                 {
-                    throw new Exception(APIClient.GetError(responseC));
-                }
-                var responseS = APIClient.GetRequest("api/Kitchen/GetList");
-                if (responseS.Result.IsSuccessStatusCode)
-                {
-                    List<KitchenViewModel> list = APIClient.GetElement<List<KitchenViewModel>>(responseS);
-                    if (list != null)
-                    {
-                        comboBoxKitchen.DisplayMember = "KitchenName";
-                        comboBoxKitchen.ValueMember = "Id";
-                        comboBoxKitchen.DataSource = list;
-                        comboBoxKitchen.SelectedItem = null;
-                    }
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(responseC));
+                    comboBoxKitchen.DisplayMember = "KitchenName";
+                    comboBoxKitchen.ValueMember = "Id";
+                    comboBoxKitchen.DataSource = listK;
+                    comboBoxKitchen.SelectedItem = null;
                 }
             }
             catch (Exception ex)
             {
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -75,32 +66,42 @@ namespace AbstractCafeView
             }
             try
             {
-                var response = APIClient.PostRequest("api/Main/PutDishOnKitchen", new KitchenDishBindingModel
+                int dishId = Convert.ToInt32(comboBoxDish.SelectedValue);
+                int kitchenId = Convert.ToInt32(comboBoxKitchen.SelectedValue);
+                int count = Convert.ToInt32(textBoxCount.Text);
+                Task task = Task.Run(() => APIClient.PostRequestData("api/Main/PutDishOnKitchen", new KitchenDishBindingModel
                 {
-                    DishId = Convert.ToInt32(comboBoxDish.SelectedValue),
-                    KitchenId = Convert.ToInt32(comboBoxKitchen.SelectedValue),
-                    Count = Convert.ToInt32(textBoxCount.Text)
-                });
-                if (response.Result.IsSuccessStatusCode)
+                    DishId = dishId,
+                    KitchenId = kitchenId,
+                    Count = count
+                }));
+
+                task.ContinueWith((prevTask) => MessageBox.Show("Кухня пополнена", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information),
+                    TaskContinuationOptions.OnlyOnRanToCompletion);
+                task.ContinueWith((prevTask) =>
                 {
-                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    DialogResult = DialogResult.OK;
-                    Close();
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(response));
-                }
+                    var ex = (Exception)prevTask.Exception;
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                    }
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }, TaskContinuationOptions.OnlyOnFaulted);
+
+                Close();
             }
             catch (Exception ex)
             {
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
             Close();
         }
     }

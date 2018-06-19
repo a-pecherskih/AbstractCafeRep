@@ -24,19 +24,15 @@ namespace AbstractCafeView
             {
                 try
                 {
-                    var response = APIClient.GetRequest("api/Chef/Get/" + id.Value);
-                    if (response.Result.IsSuccessStatusCode)
-                    {
-                        var implementer = APIClient.GetElement<ChefViewModel>(response);
-                        textBoxFIO.Text = implementer.ChefFIO;
-                    }
-                    else
-                    {
-                        throw new Exception(APIClient.GetError(response));
-                    }
+                    var chef = Task.Run(() => APIClient.GetRequestData<ChefViewModel>("api/Chef/Get/" + id.Value)).Result;
+                    textBoxFIO.Text = chef.ChefFIO;
                 }
                 catch (Exception ex)
                 {
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                    }
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -49,44 +45,40 @@ namespace AbstractCafeView
                 MessageBox.Show("Заполните ФИО", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            try
+            string fio = textBoxFIO.Text;
+            Task task;
+            if (id.HasValue)
             {
-                Task<HttpResponseMessage> response;
-                if (id.HasValue)
+                task = Task.Run(() => APIClient.PostRequestData("api/Chef/UpdElement", new ChefBindingModel
                 {
-                    response = APIClient.PostRequest("api/Chef/UpdElement", new ChefBindingModel
-                    {
-                        Id = id.Value,
-                        ChefFIO = textBoxFIO.Text
-                    });
-                }
-                else
-                {
-                    response = APIClient.PostRequest("api/Chef/AddElement", new ChefBindingModel
-                    {
-                        ChefFIO = textBoxFIO.Text
-                    });
-                }
-                if (response.Result.IsSuccessStatusCode)
-                {
-                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    DialogResult = DialogResult.OK;
-                    Close();
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(response));
-                }
+                    Id = id.Value,
+                    ChefFIO = fio
+                }));
             }
-            catch (Exception ex)
+            else
             {
+                task = Task.Run(() => APIClient.PostRequestData("api/Chef/AddElement", new ChefBindingModel
+                {
+                    ChefFIO = fio
+                }));
+            }
+            task.ContinueWith((prevTask) => MessageBox.Show("Сохранение прошло успешно. Обновите список", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information),
+                TaskContinuationOptions.OnlyOnRanToCompletion);
+            task.ContinueWith((prevTask) =>
+            {
+                var ex = (Exception)prevTask.Exception;
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+
+            Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
             Close();
         }
     }
