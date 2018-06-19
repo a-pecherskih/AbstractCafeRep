@@ -75,7 +75,7 @@ namespace AbstractCafeService.ImplementatinsList
                 {
                     var dishName = source.Dishs
                                     .FirstOrDefault(rec => rec.Id == menuDish.DishId);
-                    throw new Exception("Недостаточно ингредиентов " + dishName?.DishName +
+                    throw new Exception("Недостаточно блюд " + dishName?.DishName +
                         " требуется " + menuDish.Count + ", в наличии " + countOnKitchens);
                 }
             }

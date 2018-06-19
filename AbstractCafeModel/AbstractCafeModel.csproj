@@ -43,7 +43,6 @@
     <Compile Include="Chef.cs" />
     <Compile Include="Choice.cs" />
     <Compile Include="ChoiceStatus.cs" />
-    <Compile Include="Class1.cs" />
     <Compile Include="Customer.cs" />
     <Compile Include="Dish.cs" />
     <Compile Include="Kitchen.cs" />
