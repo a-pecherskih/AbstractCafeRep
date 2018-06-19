@@ -46,6 +46,7 @@
             this.журналыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.buttonCreateChoice = new System.Windows.Forms.Button();
+            this.письмаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -140,35 +141,35 @@
             // шефыToolStripMenuItem
             // 
             this.шефыToolStripMenuItem.Name = "шефыToolStripMenuItem";
-            this.шефыToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.шефыToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.шефыToolStripMenuItem.Text = "Шефы";
             this.шефыToolStripMenuItem.Click += new System.EventHandler(this.шефыToolStripMenuItem_Click);
             // 
             // кухняToolStripMenuItem
             // 
             this.кухняToolStripMenuItem.Name = "кухняToolStripMenuItem";
-            this.кухняToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.кухняToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.кухняToolStripMenuItem.Text = "Кухня";
             this.кухняToolStripMenuItem.Click += new System.EventHandler(this.кухняToolStripMenuItem_Click);
             // 
             // менюToolStripMenuItem
             // 
             this.менюToolStripMenuItem.Name = "менюToolStripMenuItem";
-            this.менюToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.менюToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.менюToolStripMenuItem.Text = "Меню";
             this.менюToolStripMenuItem.Click += new System.EventHandler(this.менюToolStripMenuItem_Click);
             // 
             // блюдаToolStripMenuItem
             // 
             this.блюдаToolStripMenuItem.Name = "блюдаToolStripMenuItem";
-            this.блюдаToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.блюдаToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.блюдаToolStripMenuItem.Text = "Блюда";
             this.блюдаToolStripMenuItem.Click += new System.EventHandler(this.блюдаToolStripMenuItem_Click);
             // 
             // заказчикиToolStripMenuItem
             // 
             this.заказчикиToolStripMenuItem.Name = "заказчикиToolStripMenuItem";
-            this.заказчикиToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.заказчикиToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
             this.заказчикиToolStripMenuItem.Text = "Заказчики";
             this.заказчикиToolStripMenuItem.Click += new System.EventHandler(this.заказчикиToolStripMenuItem_Click);
             // 
@@ -189,7 +190,8 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.журналыToolStripMenuItem,
             this.пополнитьСкладToolStripMenuItem,
-            this.отчетыToolStripMenuItem});
+            this.отчетыToolStripMenuItem,
+            this.письмаToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1074, 24);
@@ -205,6 +207,13 @@
             this.buttonCreateChoice.Text = "Создать заказ";
             this.buttonCreateChoice.UseVisualStyleBackColor = true;
             this.buttonCreateChoice.Click += new System.EventHandler(this.buttonCreateChoice_Click);
+            // 
+            // письмаToolStripMenuItem
+            // 
+            this.письмаToolStripMenuItem.Name = "письмаToolStripMenuItem";
+            this.письмаToolStripMenuItem.Size = new System.Drawing.Size(62, 20);
+            this.письмаToolStripMenuItem.Text = "Письма";
+            this.письмаToolStripMenuItem.Click += new System.EventHandler(this.письмаToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -248,5 +257,6 @@
         private System.Windows.Forms.ToolStripMenuItem журналыToolStripMenuItem;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.Button buttonCreateChoice;
+        private System.Windows.Forms.ToolStripMenuItem письмаToolStripMenuItem;
     }
 }

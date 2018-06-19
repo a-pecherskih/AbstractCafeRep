@@ -151,6 +151,12 @@
     <Compile Include="FormKitchensLoad.Designer.cs">
       <DependentUpon>FormKitchensLoad.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormMails.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMails.Designer.cs">
+      <DependentUpon>FormMails.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -188,6 +194,7 @@
       <DependentUpon>FormTakeChoiceInWork.cs</DependentUpon>
     </Compile>
     <Compile Include="HttpErrorMessage.cs" />
+    <Compile Include="MailClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlServerTypes\Loader.cs" />
@@ -223,6 +230,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormKitchensLoad.resx">
       <DependentUpon>FormKitchensLoad.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormMails.resx">
+      <DependentUpon>FormMails.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>

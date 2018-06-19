@@ -11,7 +11,12 @@ namespace AbstractCafeModel
         [Required]
         public string CustomerFIO { get; set; }
 
+        public string Mail { get; set; }
+
         [ForeignKey("CustomerId")]
         public virtual List<Choice> Choices { get; set; }
+
+        [ForeignKey("CustomerId")]
+        public virtual List<MessageInfo> MessageInfos { get; set; }
     }
 }

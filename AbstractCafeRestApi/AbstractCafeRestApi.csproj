@@ -135,6 +135,7 @@
     <Compile Include="Controllers\KitchenController.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MenuController.cs" />
+    <Compile Include="Controllers\MessageInfoController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
