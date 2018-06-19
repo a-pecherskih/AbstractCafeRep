@@ -9,5 +9,9 @@
         public int DishId { get; set; }
 
         public int Count { get; set; }
+
+        public virtual Kitchen Kitchen { get; set; }
+
+        public virtual Dish Dish { get; set; }
     }
 }

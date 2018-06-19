@@ -113,7 +113,7 @@
             // 
             // buttonRef
             // 
-            this.buttonRef.Location = new System.Drawing.Point(862, 293);
+            this.buttonRef.Location = new System.Drawing.Point(862, 279);
             this.buttonRef.Name = "buttonRef";
             this.buttonRef.Size = new System.Drawing.Size(187, 26);
             this.buttonRef.TabIndex = 20;
@@ -123,7 +123,7 @@
             // 
             // buttonPayChoice
             // 
-            this.buttonPayChoice.Location = new System.Drawing.Point(862, 235);
+            this.buttonPayChoice.Location = new System.Drawing.Point(862, 221);
             this.buttonPayChoice.Name = "buttonPayChoice";
             this.buttonPayChoice.Size = new System.Drawing.Size(187, 26);
             this.buttonPayChoice.TabIndex = 19;
@@ -133,7 +133,7 @@
             // 
             // buttonChoiceReady
             // 
-            this.buttonChoiceReady.Location = new System.Drawing.Point(862, 177);
+            this.buttonChoiceReady.Location = new System.Drawing.Point(862, 163);
             this.buttonChoiceReady.Name = "buttonChoiceReady";
             this.buttonChoiceReady.Size = new System.Drawing.Size(187, 26);
             this.buttonChoiceReady.TabIndex = 18;
@@ -143,7 +143,7 @@
             // 
             // buttonTakeChoiceInWork
             // 
-            this.buttonTakeChoiceInWork.Location = new System.Drawing.Point(862, 121);
+            this.buttonTakeChoiceInWork.Location = new System.Drawing.Point(862, 107);
             this.buttonTakeChoiceInWork.Name = "buttonTakeChoiceInWork";
             this.buttonTakeChoiceInWork.Size = new System.Drawing.Size(187, 26);
             this.buttonTakeChoiceInWork.TabIndex = 17;
@@ -153,7 +153,7 @@
             // 
             // buttonCreateChoice
             // 
-            this.buttonCreateChoice.Location = new System.Drawing.Point(862, 66);
+            this.buttonCreateChoice.Location = new System.Drawing.Point(862, 52);
             this.buttonCreateChoice.Name = "buttonCreateChoice";
             this.buttonCreateChoice.Size = new System.Drawing.Size(187, 26);
             this.buttonCreateChoice.TabIndex = 16;
@@ -165,7 +165,7 @@
             // 
             this.dataGridView.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.Location = new System.Drawing.Point(0, 41);
+            this.dataGridView.Location = new System.Drawing.Point(0, 27);
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.Size = new System.Drawing.Size(856, 333);
             this.dataGridView.TabIndex = 15;
@@ -174,7 +174,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1056, 376);
+            this.ClientSize = new System.Drawing.Size(1056, 367);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.buttonRef);
             this.Controls.Add(this.buttonPayChoice);

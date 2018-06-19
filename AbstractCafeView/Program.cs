@@ -1,9 +1,8 @@
-﻿using AbstractCafeService.ImplementatinsList;
+﻿using AbstractCafeService;
+using AbstractCafeService.ImplementationsBD;
 using AbstractCafeService.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Data.Entity;
 using System.Windows.Forms;
 using Unity;
 using Unity.Lifetime;
@@ -28,12 +27,13 @@ namespace AbstractCafeView
         public static IUnityContainer BuildUnityContainer()
         {
             var currentContainer = new UnityContainer();
-            currentContainer.RegisterType<ICustomerService, CustomerServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IDishService, DishServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IChefService, ChefServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IMenuService, MenuServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IKitchenService, KitchenServiceList>(new HierarchicalLifetimeManager());
-            currentContainer.RegisterType<IMainService, MainServiceList>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<DbContext, AbstractDbContext>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<ICustomerService, CustomerServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IDishService, DishServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IChefService, ChefServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IMenuService, MenuServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IKitchenService, KitchenServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IMainService, MainServiceBD>(new HierarchicalLifetimeManager());
 
             return currentContainer;
         }
