@@ -40,16 +40,15 @@ namespace AbstractCafeService.ImplementationsBD
                     CustomerFIO = element.CustomerFIO
                 };
             }
-            throw new Exception("Покупатель не найден");
+            throw new Exception("Элемент не найден");
         }
 
         public void AddElement(CustomerBindingModel model)
         {
-            Customer element = context.Customers.FirstOrDefault(rec =>
-                                    rec.CustomerFIO == model.CustomerFIO);
+            Customer element = context.Customers.FirstOrDefault(rec => rec.CustomerFIO == model.CustomerFIO);
             if (element != null)
             {
-                throw new Exception("Уже есть покупатель с таким ФИО");
+                throw new Exception("Уже есть клиент с таким ФИО");
             }
             context.Customers.Add(new Customer
             {
@@ -64,12 +63,12 @@ namespace AbstractCafeService.ImplementationsBD
                                     rec.CustomerFIO == model.CustomerFIO && rec.Id != model.Id);
             if (element != null)
             {
-                throw new Exception("Уже есть покупатель с таким ФИО");
+                throw new Exception("Уже есть клиент с таким ФИО");
             }
             element = context.Customers.FirstOrDefault(rec => rec.Id == model.Id);
             if (element == null)
             {
-                throw new Exception("Покупатель не найден");
+                throw new Exception("Элемент не найден");
             }
             element.CustomerFIO = model.CustomerFIO;
             context.SaveChanges();
@@ -85,7 +84,7 @@ namespace AbstractCafeService.ImplementationsBD
             }
             else
             {
-                throw new Exception("Покупатель не найден");
+                throw new Exception("Элемент не найден");
             }
         }
     }

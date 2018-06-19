@@ -1,52 +1,53 @@
 ﻿using AbstractCafeService.BindingModel;
-using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace AbstractCafeView
 {
     public partial class FormCreateChoice : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
-        private readonly ICustomerService serviceC;
-
-        private readonly IMenuService serviceP;
-
-        private readonly IMainService serviceM;
-
-        public FormCreateChoice(ICustomerService serviceC, IMenuService serviceP, IMainService serviceM)
+        public FormCreateChoice()
         {
             InitializeComponent();
-            this.serviceC = serviceC;
-            this.serviceP = serviceP;
-            this.serviceM = serviceM;
         }
 
         private void FormCreateChoice_Load(object sender, EventArgs e)
         {
             try
             {
-                List<CustomerViewModel> listC = serviceC.GetList();
-                if (listC != null)
+                var responseC = APIClient.GetRequest("api/Customer/GetList");
+                if (responseC.Result.IsSuccessStatusCode)
                 {
-                    comboBoxCustomer.DisplayMember = "CustomerFIO";
-                    comboBoxCustomer.ValueMember = "Id";
-                    comboBoxCustomer.DataSource = listC;
-                    comboBoxCustomer.SelectedItem = null;
+                    List<CustomerViewModel> list = APIClient.GetElement<List<CustomerViewModel>>(responseC);
+                    if (list != null)
+                    {
+                        comboBoxCustomer.DisplayMember = "CustomerFIO";
+                        comboBoxCustomer.ValueMember = "Id";
+                        comboBoxCustomer.DataSource = list;
+                        comboBoxCustomer.SelectedItem = null;
+                    }
                 }
-                List<MenuViewModel> listP = serviceP.GetList();
-                if (listP != null)
+                else
                 {
-                    comboBoxMenu.DisplayMember = "MenuName";
-                    comboBoxMenu.ValueMember = "Id";
-                    comboBoxMenu.DataSource = listP;
-                    comboBoxMenu.SelectedItem = null;
+                    throw new Exception(APIClient.GetError(responseC));
+                }
+                var responseP = APIClient.GetRequest("api/Menu/GetList");
+                if (responseP.Result.IsSuccessStatusCode)
+                {
+                    List<MenuViewModel> list = APIClient.GetElement<List<MenuViewModel>>(responseP);
+                    if (list != null)
+                    {
+                        comboBoxMenu.DisplayMember = "MenuName";
+                        comboBoxMenu.ValueMember = "Id";
+                        comboBoxMenu.DataSource = list;
+                        comboBoxMenu.SelectedItem = null;
+                    }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(responseP));
                 }
             }
             catch (Exception ex)
@@ -62,9 +63,17 @@ namespace AbstractCafeView
                 try
                 {
                     int id = Convert.ToInt32(comboBoxMenu.SelectedValue);
-                    MenuViewModel menu = serviceP.GetElement(id);
-                    int count = Convert.ToInt32(textBoxCount.Text);
-                    textBoxSum.Text = (count * menu.Price).ToString();
+                    var responseP = APIClient.GetRequest("api/Menu/Get/" + id);
+                    if (responseP.Result.IsSuccessStatusCode)
+                    {
+                        MenuViewModel menu = APIClient.GetElement<MenuViewModel>(responseP);
+                        int count = Convert.ToInt32(textBoxCount.Text);
+                        textBoxSum.Text = (count * (int)menu.Price).ToString();
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(responseP));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -102,16 +111,23 @@ namespace AbstractCafeView
             }
             try
             {
-                serviceM.CreateChoice(new ChoiceBindingModel
+                var response = APIClient.PostRequest("api/Main/CreateChoice", new ChoiceBindingModel
                 {
                     CustomerId = Convert.ToInt32(comboBoxCustomer.SelectedValue),
                     MenuId = Convert.ToInt32(comboBoxMenu.SelectedValue),
                     Count = Convert.ToInt32(textBoxCount.Text),
                     Sum = Convert.ToInt32(textBoxSum.Text)
                 });
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

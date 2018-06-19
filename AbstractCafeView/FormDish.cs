@@ -1,28 +1,21 @@
 ﻿using AbstractCafeService.BindingModel;
-using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace AbstractCafeView
 {
     public partial class FormDish : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
         public int Id { set { id = value; } }
-
-        private readonly IDishService service;
 
         private int? id;
 
-        public FormDish(IDishService service)
+        public FormDish()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormDish_Load(object sender, EventArgs e)
@@ -31,10 +24,15 @@ namespace AbstractCafeView
             {
                 try
                 {
-                    DishViewModel view = service.GetElement(id.Value);
-                    if (view != null)
+                    var response = APIClient.GetRequest("api/Dish/Get/" + id.Value);
+                    if (response.Result.IsSuccessStatusCode)
                     {
-                        textBoxName.Text = view.DishName;
+                        var dish = APIClient.GetElement<DishViewModel>(response);
+                        textBoxName.Text = dish.DishName;
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
                     }
                 }
                 catch (Exception ex)
@@ -53,9 +51,10 @@ namespace AbstractCafeView
             }
             try
             {
+                Task<HttpResponseMessage> response;
                 if (id.HasValue)
                 {
-                    service.UpdElement(new DishBindingModel
+                    response = APIClient.PostRequest("api/Dish/UpdElement", new DishBindingModel
                     {
                         Id = id.Value,
                         DishName = textBoxName.Text
@@ -63,14 +62,21 @@ namespace AbstractCafeView
                 }
                 else
                 {
-                    service.AddElement(new DishBindingModel
+                    response = APIClient.PostRequest("api/Dish/AddElement", new DishBindingModel
                     {
                         DishName = textBoxName.Text
                     });
                 }
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {
