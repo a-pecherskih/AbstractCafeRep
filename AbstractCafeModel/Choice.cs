@@ -21,5 +21,11 @@ namespace AbstractCafeModel
         public DateTime DateCreate { get; set; }
 
         public DateTime? DateImplement { get; set; }
+
+        public virtual Customer Customer { get; set; }
+
+        public virtual Menu Menu { get; set; }
+
+        public virtual Chef Chef { get; set; }
     }
 }

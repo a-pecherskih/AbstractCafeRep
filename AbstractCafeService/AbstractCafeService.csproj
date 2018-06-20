@@ -30,7 +30,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -40,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractDBContext.cs" />
     <Compile Include="BindingModel\ChefBindingModel.cs" />
     <Compile Include="BindingModel\ChoiceBindingModel.cs" />
     <Compile Include="BindingModel\CustomerBindingModel.cs" />
@@ -55,12 +63,23 @@
     <Compile Include="ImplementatinsList\KitchenServiceList.cs" />
     <Compile Include="ImplementatinsList\MainServiceList.cs" />
     <Compile Include="ImplementatinsList\MenuServiceList.cs" />
+    <Compile Include="ImplementationsBD\ChefServiceBD.cs" />
+    <Compile Include="ImplementationsBD\CustomerServiceBD.cs" />
+    <Compile Include="ImplementationsBD\DishServiceBD.cs" />
+    <Compile Include="ImplementationsBD\KitchenServiceBD.cs" />
+    <Compile Include="ImplementationsBD\MainServiceBD.cs" />
+    <Compile Include="ImplementationsBD\MenuServiceBD.cs" />
     <Compile Include="Interfaces\IChefService.cs" />
     <Compile Include="Interfaces\ICustomerService.cs" />
     <Compile Include="Interfaces\IDishService.cs" />
     <Compile Include="Interfaces\IKitchenService.cs" />
     <Compile Include="Interfaces\IMainService.cs" />
     <Compile Include="Interfaces\IMenuService.cs" />
+    <Compile Include="Migrations\201806191331100_FirstMigration.cs" />
+    <Compile Include="Migrations\201806191331100_FirstMigration.Designer.cs">
+      <DependentUpon>201806191331100_FirstMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\ChefViewModel.cs" />
     <Compile Include="ViewModels\ChoiceViewModel.cs" />
@@ -77,6 +96,17 @@
       <Name>AbstractCafeModel</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Microsoft\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201806191331100_FirstMigration.resx">
+      <DependentUpon>201806191331100_FirstMigration.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
