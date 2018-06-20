@@ -4,6 +4,7 @@ using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AbstractCafeService.ImplementatinsList
 {
@@ -18,235 +19,166 @@ namespace AbstractCafeService.ImplementatinsList
 
         public List<MenuViewModel> GetList()
         {
-            List<MenuViewModel> result = new List<MenuViewModel>();
-            for (int i = 0; i < source.Menus.Count; ++i)
-            {
-                List<MenuDishViewModel> menuDishs = new List<MenuDishViewModel>();
-                for (int j = 0; j < source.MenuDishs.Count; ++j)
+            List<MenuViewModel> result = source.Menus
+                .Select(rec => new MenuViewModel
                 {
-                    if (source.MenuDishs[j].MenuId == source.Menus[i].Id)
-                    {
-                        string dishName = string.Empty;
-                        for (int k = 0; k < source.Dishs.Count; ++k)
-                        {
-                            if (source.MenuDishs[j].DishId == source.Dishs[k].Id)
+                    Id = rec.Id,
+                    MenuName = rec.MenuName,
+                    Price = rec.Price,
+                    MenuDishs = source.MenuDishs
+                            .Where(recPC => recPC.MenuId == rec.Id)
+                            .Select(recPC => new MenuDishViewModel
                             {
-                                dishName = source.Dishs[k].DishName;
-                                break;
-                            }
-                        }
-                        menuDishs.Add(new MenuDishViewModel
-                        {
-                            Id = source.MenuDishs[j].Id,
-                            MenuId = source.MenuDishs[j].MenuId,
-                            DishId = source.MenuDishs[j].DishId,
-                            DishName = dishName,
-                            Count = source.MenuDishs[j].Count
-                        });
-                    }
-                }
-                result.Add(new MenuViewModel
-                {
-                    Id = source.Menus[i].Id,
-                    MenuName = source.Menus[i].MenuName,
-                    Price = source.Menus[i].Price,
-                    MenuDishs = menuDishs
-                });
-            }
+                                Id = recPC.Id,
+                                MenuId = recPC.MenuId,
+                                DishId = recPC.DishId,
+                                DishName = source.Dishs
+                                    .FirstOrDefault(recC => recC.Id == recPC.DishId)?.DishName,
+                                Count = recPC.Count
+                            })
+                            .ToList()
+                })
+                .ToList();
             return result;
         }
 
         public MenuViewModel GetElement(int id)
         {
-            for (int i = 0; i < source.Menus.Count; ++i)
+            Menu element = source.Menus.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                List<MenuDishViewModel> menuDishs = new List<MenuDishViewModel>();
-                for (int j = 0; j < source.MenuDishs.Count; ++j)
+                return new MenuViewModel
                 {
-                    if (source.MenuDishs[j].MenuId == source.Menus[i].Id)
-                    {
-                        string dishName = string.Empty;
-                        for (int k = 0; k < source.Dishs.Count; ++k)
-                        {
-                            if (source.MenuDishs[j].DishId == source.Dishs[k].Id)
+                    Id = element.Id,
+                    MenuName = element.MenuName,
+                    Price = element.Price,
+                    MenuDishs = source.MenuDishs
+                            .Where(recCC => recCC.MenuId == element.Id)
+                            .Select(recCC => new MenuDishViewModel
                             {
-                                dishName = source.Dishs[k].DishName;
-                                break;
-                            }
-                        }
-                        menuDishs.Add(new MenuDishViewModel
-                        {
-                            Id = source.MenuDishs[j].Id,
-                            MenuId = source.MenuDishs[j].MenuId,
-                            DishId = source.MenuDishs[j].DishId,
-                            DishName = dishName,
-                            Count = source.MenuDishs[j].Count
-                        });
-                    }
-                }
-                if (source.Menus[i].Id == id)
-                {
-                    return new MenuViewModel
-                    {
-                        Id = source.Menus[i].Id,
-                        MenuName = source.Menus[i].MenuName,
-                        Price = source.Menus[i].Price,
-                        MenuDishs = menuDishs
-                    };
-                }
+                                Id = recCC.Id,
+                                MenuId = recCC.MenuId,
+                                DishId = recCC.DishId,
+                                DishName = source.Dishs
+                                        .FirstOrDefault(recC => recC.Id == recCC.DishId)?.DishName,
+                                Count = recCC.Count
+                            })
+                            .ToList()
+                };
             }
-
             throw new Exception("Элемент не найден");
         }
 
         public void AddElement(MenuBindingModel model)
         {
-            int maxId = 0;
-            for (int i = 0; i < source.Menus.Count; ++i)
+            Menu element = source.Menus.FirstOrDefault(rec => rec.MenuName == model.MenuName);
+            if (element != null)
             {
-                if (source.Menus[i].Id > maxId)
-                {
-                    maxId = source.Menus[i].Id;
-                }
-                if (source.Menus[i].MenuName == model.MenuName)
-                {
-                    throw new Exception("Уже есть меню с таким названием");
-                }
+                throw new Exception("Уже есть меню с таким названием");
             }
+            int maxId = source.Menus.Count > 0 ? source.Menus.Max(rec => rec.Id) : 0;
             source.Menus.Add(new Menu
             {
                 Id = maxId + 1,
                 MenuName = model.MenuName,
                 Price = model.Price
             });
-            int maxPCId = 0;
-            for (int i = 0; i < source.MenuDishs.Count; ++i)
-            {
-                if (source.MenuDishs[i].Id > maxPCId)
-                {
-                    maxPCId = source.MenuDishs[i].Id;
-                }
-            }
-            for (int i = 0; i < model.MenuDishs.Count; ++i)
-            {
-                for (int j = 1; j < model.MenuDishs.Count; ++j)
-                {
-                    if (model.MenuDishs[i].DishId ==
-                        model.MenuDishs[j].DishId)
-                    {
-                        model.MenuDishs[i].Count +=
-                            model.MenuDishs[j].Count;
-                        model.MenuDishs.RemoveAt(j--);
-                    }
-                }
-            }
-            for (int i = 0; i < model.MenuDishs.Count; ++i)
+
+            int maxCCId = source.MenuDishs.Count > 0 ?
+                                    source.MenuDishs.Max(rec => rec.Id) : 0;
+
+            var groupDishs = model.MenuDishs
+                                        .GroupBy(rec => rec.DishId)
+                                        .Select(rec => new
+                                        {
+                                            DishId = rec.Key,
+                                            Count = rec.Sum(r => r.Count)
+                                        });
+
+            foreach (var groupDish in groupDishs)
             {
                 source.MenuDishs.Add(new MenuDish
                 {
-                    Id = ++maxPCId,
+                    Id = ++maxCCId,
                     MenuId = maxId + 1,
-                    DishId = model.MenuDishs[i].DishId,
-                    Count = model.MenuDishs[i].Count
+                    DishId = groupDish.DishId,
+                    Count = groupDish.Count
                 });
             }
         }
 
         public void UpdElement(MenuBindingModel model)
         {
-            int index = -1;
-            for (int i = 0; i < source.Menus.Count; ++i)
+            Menu element = source.Menus.FirstOrDefault(rec =>
+                                        rec.MenuName == model.MenuName && rec.Id != model.Id);
+            if (element != null)
             {
-                if (source.Menus[i].Id == model.Id)
-                {
-                    index = i;
-                }
-                if (source.Menus[i].MenuName == model.MenuName &&
-                    source.Menus[i].Id != model.Id)
-                {
-                    throw new Exception("Уже есть изделие с таким названием");
-                }
+                throw new Exception("Уже есть меню с таким названием");
             }
-            if (index == -1)
+            element = source.Menus.FirstOrDefault(rec => rec.Id == model.Id);
+            if (element == null)
             {
                 throw new Exception("Элемент не найден");
             }
-            source.Menus[index].MenuName = model.MenuName;
-            source.Menus[index].Price = model.Price;
-            int maxPCId = 0;
-            for (int i = 0; i < source.MenuDishs.Count; ++i)
+            element.MenuName = model.MenuName;
+            element.Price = model.Price;
+
+            int maxPCId = source.MenuDishs.Count > 0 ? source.MenuDishs.Max(rec => rec.Id) : 0;
+
+            var compIds = model.MenuDishs.Select(rec => rec.DishId).Distinct();
+            var updateDishs = source.MenuDishs
+                                            .Where(rec => rec.MenuId == model.Id &&
+                                           compIds.Contains(rec.DishId));
+            foreach (var updateDish in updateDishs)
             {
-                if (source.MenuDishs[i].Id > maxPCId)
-                {
-                    maxPCId = source.MenuDishs[i].Id;
-                }
+                updateDish.Count = model.MenuDishs
+                                                .FirstOrDefault(rec => rec.Id == updateDish.Id).Count;
             }
-            for (int i = 0; i < source.MenuDishs.Count; ++i)
+            source.MenuDishs.RemoveAll(rec => rec.MenuId == model.Id &&
+                                       !compIds.Contains(rec.DishId));
+
+            var groupDishs = model.MenuDishs
+                                        .Where(rec => rec.Id == 0)
+                                        .GroupBy(rec => rec.DishId)
+                                        .Select(rec => new
+                                        {
+                                            DishId = rec.Key,
+                                            Count = rec.Sum(r => r.Count)
+                                        });
+            foreach (var groupDish in groupDishs)
             {
-                if (source.MenuDishs[i].MenuId == model.Id)
+                MenuDish elementCC = source.MenuDishs
+                                        .FirstOrDefault(rec => rec.MenuId == model.Id &&
+                                                        rec.DishId == groupDish.DishId);
+                if (elementCC != null)
                 {
-                    bool flag = true;
-                    for (int j = 0; j < model.MenuDishs.Count; ++j)
-                    {
-                        if (source.MenuDishs[i].Id == model.MenuDishs[j].Id)
-                        {
-                            source.MenuDishs[i].Count = model.MenuDishs[j].Count;
-                            flag = false;
-                            break;
-                        }
-                    }
-                    if (flag)
-                    {
-                        source.MenuDishs.RemoveAt(i--);
-                    }
+                    elementCC.Count += groupDish.Count;
                 }
-            }
-            for (int i = 0; i < model.MenuDishs.Count; ++i)
-            {
-                if (model.MenuDishs[i].Id == 0)
+                else
                 {
-                    for (int j = 0; j < source.MenuDishs.Count; ++j)
+                    source.MenuDishs.Add(new MenuDish
                     {
-                        if (source.MenuDishs[j].MenuId == model.Id &&
-                            source.MenuDishs[j].DishId == model.MenuDishs[i].DishId)
-                        {
-                            source.MenuDishs[j].Count += model.MenuDishs[i].Count;
-                            model.MenuDishs[i].Id = source.MenuDishs[j].Id;
-                            break;
-                        }
-                    }
-                    if (model.MenuDishs[i].Id == 0)
-                    {
-                        source.MenuDishs.Add(new MenuDish
-                        {
-                            Id = ++maxPCId,
-                            MenuId = model.Id,
-                            DishId = model.MenuDishs[i].DishId,
-                            Count = model.MenuDishs[i].Count
-                        });
-                    }
+                        Id = ++maxPCId,
+                        MenuId = model.Id,
+                        DishId = groupDish.DishId,
+                        Count = groupDish.Count
+                    });
                 }
             }
         }
 
         public void DelElement(int id)
         {
-            for (int i = 0; i < source.MenuDishs.Count; ++i)
+            Menu element = source.Menus.FirstOrDefault(rec => rec.Id == id);
+            if (element != null)
             {
-                if (source.MenuDishs[i].MenuId == id)
-                {
-                    source.MenuDishs.RemoveAt(i--);
-                }
+                source.MenuDishs.RemoveAll(rec => rec.MenuId == id);
+                source.Menus.Remove(element);
             }
-            for (int i = 0; i < source.Menus.Count; ++i)
+            else
             {
-                if (source.Menus[i].Id == id)
-                {
-                    source.Menus.RemoveAt(i);
-                    return;
-                }
+                throw new Exception("Элемент не найден");
             }
-            throw new Exception("Элемент не найден");
         }
     }
 }

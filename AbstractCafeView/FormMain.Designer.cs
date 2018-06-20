@@ -53,7 +53,7 @@
             this.пополнитьСкладToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1068, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1056, 24);
             this.menuStrip1.TabIndex = 14;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -72,35 +72,35 @@
             // заказчикиToolStripMenuItem
             // 
             this.заказчикиToolStripMenuItem.Name = "заказчикиToolStripMenuItem";
-            this.заказчикиToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.заказчикиToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.заказчикиToolStripMenuItem.Text = "Заказчики";
             this.заказчикиToolStripMenuItem.Click += new System.EventHandler(this.заказчикиToolStripMenuItem_Click);
             // 
             // блюдаToolStripMenuItem
             // 
             this.блюдаToolStripMenuItem.Name = "блюдаToolStripMenuItem";
-            this.блюдаToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.блюдаToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.блюдаToolStripMenuItem.Text = "Блюда";
             this.блюдаToolStripMenuItem.Click += new System.EventHandler(this.блюдаToolStripMenuItem_Click);
             // 
             // менюToolStripMenuItem
             // 
             this.менюToolStripMenuItem.Name = "менюToolStripMenuItem";
-            this.менюToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.менюToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.менюToolStripMenuItem.Text = "Меню";
             this.менюToolStripMenuItem.Click += new System.EventHandler(this.менюToolStripMenuItem_Click);
             // 
             // кухняToolStripMenuItem
             // 
             this.кухняToolStripMenuItem.Name = "кухняToolStripMenuItem";
-            this.кухняToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.кухняToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.кухняToolStripMenuItem.Text = "Кухня";
             this.кухняToolStripMenuItem.Click += new System.EventHandler(this.кухняToolStripMenuItem_Click);
             // 
             // шефыToolStripMenuItem
             // 
             this.шефыToolStripMenuItem.Name = "шефыToolStripMenuItem";
-            this.шефыToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.шефыToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.шефыToolStripMenuItem.Text = "Шефы";
             this.шефыToolStripMenuItem.Click += new System.EventHandler(this.шефыToolStripMenuItem_Click);
             // 
@@ -113,7 +113,7 @@
             // 
             // buttonRef
             // 
-            this.buttonRef.Location = new System.Drawing.Point(862, 295);
+            this.buttonRef.Location = new System.Drawing.Point(862, 293);
             this.buttonRef.Name = "buttonRef";
             this.buttonRef.Size = new System.Drawing.Size(187, 26);
             this.buttonRef.TabIndex = 20;
@@ -123,7 +123,7 @@
             // 
             // buttonPayChoice
             // 
-            this.buttonPayChoice.Location = new System.Drawing.Point(862, 237);
+            this.buttonPayChoice.Location = new System.Drawing.Point(862, 235);
             this.buttonPayChoice.Name = "buttonPayChoice";
             this.buttonPayChoice.Size = new System.Drawing.Size(187, 26);
             this.buttonPayChoice.TabIndex = 19;
@@ -133,7 +133,7 @@
             // 
             // buttonChoiceReady
             // 
-            this.buttonChoiceReady.Location = new System.Drawing.Point(862, 179);
+            this.buttonChoiceReady.Location = new System.Drawing.Point(862, 177);
             this.buttonChoiceReady.Name = "buttonChoiceReady";
             this.buttonChoiceReady.Size = new System.Drawing.Size(187, 26);
             this.buttonChoiceReady.TabIndex = 18;
@@ -143,7 +143,7 @@
             // 
             // buttonTakeChoiceInWork
             // 
-            this.buttonTakeChoiceInWork.Location = new System.Drawing.Point(862, 123);
+            this.buttonTakeChoiceInWork.Location = new System.Drawing.Point(862, 121);
             this.buttonTakeChoiceInWork.Name = "buttonTakeChoiceInWork";
             this.buttonTakeChoiceInWork.Size = new System.Drawing.Size(187, 26);
             this.buttonTakeChoiceInWork.TabIndex = 17;
@@ -153,7 +153,7 @@
             // 
             // buttonCreateChoice
             // 
-            this.buttonCreateChoice.Location = new System.Drawing.Point(862, 68);
+            this.buttonCreateChoice.Location = new System.Drawing.Point(862, 66);
             this.buttonCreateChoice.Name = "buttonCreateChoice";
             this.buttonCreateChoice.Size = new System.Drawing.Size(187, 26);
             this.buttonCreateChoice.TabIndex = 16;
@@ -165,7 +165,7 @@
             // 
             this.dataGridView.BackgroundColor = System.Drawing.SystemColors.ControlLightLight;
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.Location = new System.Drawing.Point(0, 43);
+            this.dataGridView.Location = new System.Drawing.Point(0, 41);
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.Size = new System.Drawing.Size(856, 333);
             this.dataGridView.TabIndex = 15;
@@ -174,7 +174,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1068, 390);
+            this.ClientSize = new System.Drawing.Size(1056, 376);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.buttonRef);
             this.Controls.Add(this.buttonPayChoice);
