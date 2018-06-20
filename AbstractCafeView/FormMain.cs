@@ -1,7 +1,8 @@
-﻿using AbstractCafeService.Interfaces;
-using AbstractCafeService.ViewModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using AbstractCafeService.BindingModel;
+using AbstractCafeService.Interfaces;
+using AbstractCafeService.ViewModels;
 using System.Windows.Forms;
 using Unity;
 using Unity.Attributes;
@@ -15,10 +16,13 @@ namespace AbstractCafeView
 
         private readonly IMainService service;
 
-        public FormMain(IMainService service)
+        private readonly IReportService reportService;
+
+        public FormMain(IMainService service, IReportService reportService)
         {
             InitializeComponent();
             this.service = service;
+            this.reportService = reportService;
         }
 
         private void LoadData()
@@ -133,6 +137,41 @@ namespace AbstractCafeView
         private void buttonRef_Click(object sender, EventArgs e)
         {
             LoadData();
+        }
+
+        private void прайсИзделийToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog
+            {
+                Filter = "doc|*.doc|docx|*.docx"
+            };
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    reportService.SaveMenuPrice(new ReportBindingModel
+                    {
+                        FileName = sfd.FileName
+                    });
+                    MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        private void загруженностьКухниToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = Container.Resolve<FormKitchensLoad>();
+            form.ShowDialog();
+        }
+
+        private void заказыКлиентовToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var form = Container.Resolve<FormCustomerChoices>();
+            form.ShowDialog();
         }
     }
 }

@@ -34,6 +34,7 @@ namespace AbstractCafeView
             currentContainer.RegisterType<IMenuService, MenuServiceBD>(new HierarchicalLifetimeManager());
             currentContainer.RegisterType<IKitchenService, KitchenServiceBD>(new HierarchicalLifetimeManager());
             currentContainer.RegisterType<IMainService, MainServiceBD>(new HierarchicalLifetimeManager());
+            currentContainer.RegisterType<IReportService, ReportServiceBD>(new HierarchicalLifetimeManager());
 
             return currentContainer;
         }

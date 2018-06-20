@@ -36,6 +36,19 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13\lib\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Word, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.Word.15.0.4797.1003\lib\net20\Microsoft.Office.Interop.Word.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -56,6 +69,7 @@
     <Compile Include="BindingModel\KitchenDishBindingModel.cs" />
     <Compile Include="BindingModel\MenuBindingModel.cs" />
     <Compile Include="BindingModel\MenuDishBindingModel.cs" />
+    <Compile Include="BindingModel\ReportBindingModel.cs" />
     <Compile Include="DataListSingleton.cs" />
     <Compile Include="ImplementatinsList\ChefServiceList.cs" />
     <Compile Include="ImplementatinsList\CustomerServiceList.cs" />
@@ -66,26 +80,35 @@
     <Compile Include="ImplementationsBD\ChefServiceBD.cs" />
     <Compile Include="ImplementationsBD\CustomerServiceBD.cs" />
     <Compile Include="ImplementationsBD\DishServiceBD.cs" />
+    <Compile Include="Interfaces\IReportService.cs" />
     <Compile Include="ImplementationsBD\KitchenServiceBD.cs" />
     <Compile Include="ImplementationsBD\MainServiceBD.cs" />
     <Compile Include="ImplementationsBD\MenuServiceBD.cs" />
+    <Compile Include="ImplementationsBD\ReportServiceBD.cs" />
     <Compile Include="Interfaces\IChefService.cs" />
     <Compile Include="Interfaces\ICustomerService.cs" />
     <Compile Include="Interfaces\IDishService.cs" />
     <Compile Include="Interfaces\IKitchenService.cs" />
     <Compile Include="Interfaces\IMainService.cs" />
     <Compile Include="Interfaces\IMenuService.cs" />
-    <Compile Include="Migrations\201806191331100_FirstMigration.cs" />
-    <Compile Include="Migrations\201806191331100_FirstMigration.Designer.cs">
-      <DependentUpon>201806191331100_FirstMigration.cs</DependentUpon>
+    <Compile Include="Migrations\201806191341552_FirstMigration.cs" />
+    <Compile Include="Migrations\201806191341552_FirstMigration.Designer.cs">
+      <DependentUpon>201806191341552_FirstMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\ChefViewModel.cs" />
     <Compile Include="ViewModels\ChoiceViewModel.cs" />
+    <Compile Include="ViewModels\CustomerChoicesModel.cs" />
     <Compile Include="ViewModels\CustomerViewModel.cs" />
     <Compile Include="ViewModels\DishViewModel.cs" />
     <Compile Include="ViewModels\KitchenDishViewModel.cs" />
+    <Compile Include="ViewModels\KitchenLoadViewModel.cs" />
     <Compile Include="ViewModels\KitchenViewModel.cs" />
     <Compile Include="ViewModels\MenuDishViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
@@ -99,13 +122,18 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="Resources\TIMCYR.TTF" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Microsoft\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201806191331100_FirstMigration.resx">
-      <DependentUpon>201806191331100_FirstMigration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201806191341552_FirstMigration.resx">
+      <DependentUpon>201806191341552_FirstMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
