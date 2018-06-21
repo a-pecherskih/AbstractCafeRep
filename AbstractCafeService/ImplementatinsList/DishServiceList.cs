@@ -64,7 +64,7 @@ namespace AbstractCafeService.ImplementatinsList
                                         rec.DishName == model.DishName && rec.Id != model.Id);
             if (element != null)
             {
-                throw new Exception("Уже есть ингредиент с таким названием");
+                throw new Exception("Уже есть блюдо с таким названием");
             }
             element = source.Dishs.FirstOrDefault(rec => rec.Id == model.Id);
             if (element == null)
