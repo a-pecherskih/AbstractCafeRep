@@ -31,6 +31,8 @@ namespace AbstractCafeService
 
         public virtual DbSet<KitchenDish> KitchenDishs { get; set; }
 
+        public virtual DbSet<MessageInfo> MessageInfos { get; set; }
+
 
         public override int SaveChanges()
         {

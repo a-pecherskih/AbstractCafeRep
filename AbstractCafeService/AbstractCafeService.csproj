@@ -73,6 +73,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
@@ -92,6 +93,7 @@
     <Compile Include="BindingModel\KitchenDishBindingModel.cs" />
     <Compile Include="BindingModel\MenuBindingModel.cs" />
     <Compile Include="BindingModel\MenuDishBindingModel.cs" />
+    <Compile Include="BindingModel\MessageInfoBindingModel.cs" />
     <Compile Include="BindingModel\ReportBindingModel.cs" />
     <Compile Include="DataListSingleton.cs" />
     <Compile Include="ImplementatinsList\ChefServiceList.cs" />
@@ -103,6 +105,8 @@
     <Compile Include="ImplementationsBD\ChefServiceBD.cs" />
     <Compile Include="ImplementationsBD\CustomerServiceBD.cs" />
     <Compile Include="ImplementationsBD\DishServiceBD.cs" />
+    <Compile Include="ImplementationsBD\MessageInfoServiceBD.cs" />
+    <Compile Include="Interfaces\IMessageInfoService.cs" />
     <Compile Include="Interfaces\IReportService.cs" />
     <Compile Include="ImplementationsBD\KitchenServiceBD.cs" />
     <Compile Include="ImplementationsBD\MainServiceBD.cs" />
@@ -117,6 +121,14 @@
     <Compile Include="Migrations\201805191302552_FirstMigration.cs" />
     <Compile Include="Migrations\201805191302552_FirstMigration.Designer.cs">
       <DependentUpon>201805191302552_FirstMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201806191914323_AddFiendInCustomer.cs" />
+    <Compile Include="Migrations\201806191914323_AddFiendInCustomer.Designer.cs">
+      <DependentUpon>201806191914323_AddFiendInCustomer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201806191917405_AddTableMessageInfo.cs" />
+    <Compile Include="Migrations\201806191917405_AddTableMessageInfo.Designer.cs">
+      <DependentUpon>201806191917405_AddTableMessageInfo.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -136,6 +148,7 @@
     <Compile Include="ViewModels\KitchenViewModel.cs" />
     <Compile Include="ViewModels\MenuDishViewModel.cs" />
     <Compile Include="ViewModels\MenuViewModel.cs" />
+    <Compile Include="ViewModels\MessageInfoViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AbstractCafeModel\AbstractCafeModel.csproj">
@@ -156,6 +169,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201805191302552_FirstMigration.resx">
       <DependentUpon>201805191302552_FirstMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806191914323_AddFiendInCustomer.resx">
+      <DependentUpon>201806191914323_AddFiendInCustomer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806191917405_AddTableMessageInfo.resx">
+      <DependentUpon>201806191917405_AddTableMessageInfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
