@@ -1,28 +1,21 @@
 ﻿using AbstractCafeService.BindingModel;
-using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace AbstractCafeView
 {
     public partial class FormChef : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
         public int Id { set { id = value; } }
-
-        private readonly IChefService service;
 
         private int? id;
 
-        public FormChef(IChefService service)
+        public FormChef()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormChef_Load(object sender, EventArgs e)
@@ -31,10 +24,15 @@ namespace AbstractCafeView
             {
                 try
                 {
-                    ChefViewModel view = service.GetElement(id.Value);
-                    if (view != null)
+                    var response = APIClient.GetRequest("api/Chef/Get/" + id.Value);
+                    if (response.Result.IsSuccessStatusCode)
                     {
-                        textBoxFIO.Text = view.ChefFIO;
+                        var implementer = APIClient.GetElement<ChefViewModel>(response);
+                        textBoxFIO.Text = implementer.ChefFIO;
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
                     }
                 }
                 catch (Exception ex)
@@ -53,9 +51,10 @@ namespace AbstractCafeView
             }
             try
             {
+                Task<HttpResponseMessage> response;
                 if (id.HasValue)
                 {
-                    service.UpdElement(new ChefBindingModel
+                    response = APIClient.PostRequest("api/Chef/UpdElement", new ChefBindingModel
                     {
                         Id = id.Value,
                         ChefFIO = textBoxFIO.Text
@@ -63,14 +62,21 @@ namespace AbstractCafeView
                 }
                 else
                 {
-                    service.AddElement(new ChefBindingModel
+                    response = APIClient.PostRequest("api/Chef/AddElement", new ChefBindingModel
                     {
                         ChefFIO = textBoxFIO.Text
                     });
                 }
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

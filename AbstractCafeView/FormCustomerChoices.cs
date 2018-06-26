@@ -1,30 +1,20 @@
 ﻿using AbstractCafeService.BindingModel;
-using AbstractCafeService.Interfaces;
+using AbstractCafeService.ViewModels;
 using Microsoft.Reporting.WinForms;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace AbstractCafeView
 {
     public partial class FormCustomerChoices : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
-        private readonly IReportService service;
-
-        public FormCustomerChoices(IReportService service)
+        public FormCustomerChoices()
         {
             InitializeComponent();
-            this.service = service;
         }
 
-        private void FormCustomerChoices_Load(object sender, EventArgs e)
-        {
-            this.reportViewer.RefreshReport();
-        }
+        private void FormCustomerChoices_Load(object sender, EventArgs e){}
 
         private void buttonMake_Click(object sender, EventArgs e)
         {
@@ -40,13 +30,21 @@ namespace AbstractCafeView
                                             " по " + dateTimePickerTo.Value.ToShortDateString());
                 reportViewer.LocalReport.SetParameters(parameter);
 
-                var dataSource = service.GetCustomerChoices(new ReportBindingModel
+                var response = APIClient.PostRequest("api/Report/GetCustomerChoices", new ReportBindingModel
                 {
                     DateFrom = dateTimePickerFrom.Value,
                     DateTo = dateTimePickerTo.Value
                 });
-                ReportDataSource source = new ReportDataSource("DataSetChoices", dataSource);
-                reportViewer.LocalReport.DataSources.Add(source);
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    var dataSource = APIClient.GetElement<List<CustomerChoicesModel>>(response);
+                    ReportDataSource source = new ReportDataSource("DataSetChoices", dataSource);
+                    reportViewer.LocalReport.DataSources.Add(source);
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
 
                 reportViewer.RefreshReport();
             }
@@ -71,13 +69,20 @@ namespace AbstractCafeView
             {
                 try
                 {
-                    service.SaveCustomerChoices(new ReportBindingModel
+                    var response = APIClient.PostRequest("api/Report/SaveCustomerChoices", new ReportBindingModel
                     {
                         FileName = sfd.FileName,
                         DateFrom = dateTimePickerFrom.Value,
                         DateTo = dateTimePickerTo.Value
                     });
-                    MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
                 }
                 catch (Exception ex)
                 {

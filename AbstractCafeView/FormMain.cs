@@ -1,43 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using AbstractCafeService.BindingModel;
-using AbstractCafeService.Interfaces;
+﻿using AbstractCafeService.BindingModel;
 using AbstractCafeService.ViewModels;
+using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace AbstractCafeView
 {
     public partial class FormMain : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
-        private readonly IMainService service;
-
-        private readonly IReportService reportService;
-
-        public FormMain(IMainService service, IReportService reportService)
+        public FormMain()
         {
             InitializeComponent();
-            this.service = service;
-            this.reportService = reportService;
         }
 
         private void LoadData()
         {
             try
             {
-                List<ChoiceViewModel> list = service.GetList();
-                if (list != null)
+                var response = APIClient.GetRequest("api/Main/GetList");
+                if (response.Result.IsSuccessStatusCode)
                 {
-                    dataGridView.DataSource = list;
-                    dataGridView.Columns[0].Visible = false;
-                    dataGridView.Columns[1].Visible = false;
-                    dataGridView.Columns[3].Visible = false;
-                    dataGridView.Columns[5].Visible = false;
-                    dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    List<ChoiceViewModel> list = APIClient.GetElement<List<ChoiceViewModel>>(response);
+                    if (list != null)
+                    {
+                        dataGridView.DataSource = list;
+                        dataGridView.Columns[0].Visible = false;
+                        dataGridView.Columns[1].Visible = false;
+                        dataGridView.Columns[3].Visible = false;
+                        dataGridView.Columns[5].Visible = false;
+                        dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -48,43 +45,43 @@ namespace AbstractCafeView
 
         private void заказчикиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormCustomers>();
+            var form = new FormCustomers();
             form.ShowDialog();
         }
 
         private void блюдаToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormDishs>();
+            var form = new FormDishs();
             form.ShowDialog();
         }
 
         private void менюToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormMenus>();
+            var form = new FormMenus();
             form.ShowDialog();
         }
 
         private void кухняToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormKitchens>();
+            var form = new FormKitchens();
             form.ShowDialog();
         }
 
         private void шефыToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormChefs>();
+            var form = new FormChefs();
             form.ShowDialog();
         }
 
         private void пополнитьСкладToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormPutInKitchen>();
+            var form = new FormPutInKitchen();
             form.ShowDialog();
         }
 
         private void buttonCreateChoice_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormCreateChoice>();
+            var form = new FormCreateChoice();
             form.ShowDialog();
             LoadData();
         }
@@ -93,8 +90,10 @@ namespace AbstractCafeView
         {
             if (dataGridView.SelectedRows.Count == 1)
             {
-                var form = Container.Resolve<FormTakeChoiceInWork>();
-                form.Id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
+                var form = new FormTakeChoiceInWork
+                {
+                    Id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value)
+                };
                 form.ShowDialog();
                 LoadData();
             }
@@ -107,8 +106,18 @@ namespace AbstractCafeView
                 int id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
                 try
                 {
-                    service.FinishChoice(id);
-                    LoadData();
+                    var response = APIClient.PostRequest("api/Main/FinishChoice", new ChoiceBindingModel
+                    {
+                        Id = id
+                    });
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        LoadData();
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -124,8 +133,18 @@ namespace AbstractCafeView
                 int id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
                 try
                 {
-                    service.PayChoice(id);
-                    LoadData();
+                    var response = APIClient.PostRequest("api/Main/PayChoice", new ChoiceBindingModel
+                    {
+                        Id = id
+                    });
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        LoadData();
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -149,11 +168,18 @@ namespace AbstractCafeView
             {
                 try
                 {
-                    reportService.SaveMenuPrice(new ReportBindingModel
+                    var response = APIClient.PostRequest("api/Report/SaveMenuPrice", new ReportBindingModel
                     {
                         FileName = sfd.FileName
                     });
-                    MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -164,13 +190,13 @@ namespace AbstractCafeView
 
         private void загруженностьКухниToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormKitchensLoad>();
+            var form = new FormKitchensLoad();
             form.ShowDialog();
         }
 
         private void заказыКлиентовToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormCustomerChoices>();
+            var form = new FormCustomerChoices();
             form.ShowDialog();
         }
     }

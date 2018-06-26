@@ -13,7 +13,7 @@ namespace AbstractCafeService.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201806191331100_FirstMigration"; }
+            get { return "201805191302552_FirstMigration"; }
         }
         
         string IMigrationMetadata.Source

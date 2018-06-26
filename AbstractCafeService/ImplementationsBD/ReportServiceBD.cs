@@ -131,7 +131,7 @@ namespace AbstractCafeService.ImplementationsBD
             {
                 KitchenName = kitchen.KitchenName,
                 TotalCount = kitchenDishList.Sum(r => r.Count),
-                Dishs = kitchenDishList.Select(r => new Tuple<string, int>(r.Dish.DishName, r.Count))
+                Dishs = kitchenDishList.Select(r => new KitchensDishLoadViewModel { DishName = r.Dish.DishName, Count = r.Count }).ToList()
             })
                             .ToList();
         }
@@ -209,9 +209,9 @@ namespace AbstractCafeService.ImplementationsBD
 
                             foreach (var listElem in elem.Dishs)
                             {
-                                excelcells.Value2 = listElem.Item1;
+                                excelcells.Value2 = listElem.DishName;
                                 excelcells.ColumnWidth = 10;
-                                excelcells.get_Offset(0, 1).Value2 = listElem.Item2;
+                                excelcells.get_Offset(0, 1).Value2 = listElem.Count;
                                 excelcells = excelcells.get_Offset(1, 0);
                             }
                         }

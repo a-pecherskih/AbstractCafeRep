@@ -48,7 +48,7 @@ namespace AbstractCafeService.ImplementatinsList
             Customer element = source.Customers.FirstOrDefault(rec => rec.CustomerFIO == model.CustomerFIO);
             if (element != null)
             {
-                throw new Exception("Уже есть покупатель с таким ФИО");
+                throw new Exception("Уже есть клиент с таким ФИО");
             }
             int maxId = source.Customers.Count > 0 ? source.Customers.Max(rec => rec.Id) : 0;
             source.Customers.Add(new Customer
@@ -61,10 +61,10 @@ namespace AbstractCafeService.ImplementatinsList
         public void UpdElement(CustomerBindingModel model)
         {
             Customer element = source.Customers.FirstOrDefault(rec =>
-                                   rec.CustomerFIO == model.CustomerFIO && rec.Id != model.Id);
+                                    rec.CustomerFIO == model.CustomerFIO && rec.Id != model.Id);
             if (element != null)
             {
-                throw new Exception("Уже есть покупатель с таким ФИО");
+                throw new Exception("Уже есть клиент с таким ФИО");
             }
             element = source.Customers.FirstOrDefault(rec => rec.Id == model.Id);
             if (element == null)

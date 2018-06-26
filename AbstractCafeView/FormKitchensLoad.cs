@@ -1,18 +1,17 @@
 ﻿using AbstractCafeService.BindingModel;
 using AbstractCafeService.Interfaces;
+using AbstractCafeService.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace AbstractCafeView
 {
     public partial class FormKitchensLoad : Form
     {
-        private readonly IReportService service;
-
-        public FormKitchensLoad(IReportService service)
+        public FormKitchensLoad()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void buttonSaveToExcel_Click(object sender, EventArgs e)
@@ -25,11 +24,18 @@ namespace AbstractCafeView
             {
                 try
                 {
-                    service.SaveKitchensLoad(new ReportBindingModel
+                    var response = APIClient.PostRequest("api/Report/SaveKitchensLoad", new ReportBindingModel
                     {
                         FileName = sfd.FileName
                     });
-                    MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -42,20 +48,24 @@ namespace AbstractCafeView
         {
             try
             {
-                var dict = service.GetKitchensLoad();
-                if (dict != null)
+                var response = APIClient.GetRequest("api/Report/GetKitchensLoad");
+                if (response.Result.IsSuccessStatusCode)
                 {
                     dataGridView.Rows.Clear();
-                    foreach (var elem in dict)
+                    foreach (var elem in APIClient.GetElement<List<KitchensLoadViewModel>>(response))
                     {
                         dataGridView.Rows.Add(new object[] { elem.KitchenName, "", "" });
                         foreach (var listElem in elem.Dishs)
                         {
-                            dataGridView.Rows.Add(new object[] { "", listElem.Item1, listElem.Item2 });
+                            dataGridView.Rows.Add(new object[] { "", listElem.DishName, listElem.Count });
                         }
                         dataGridView.Rows.Add(new object[] { "Итого", "", elem.TotalCount });
                         dataGridView.Rows.Add(new object[] { });
                     }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)

@@ -3,39 +3,33 @@ using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace AbstractCafeView
 {
     public partial class FormMenu : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
         public int Id { set { id = value; } }
-
-        private readonly IMenuService service;
 
         private int? id;
 
-        private List<MenuDishViewModel> MenuDishs;
+        private List<MenuDishViewModel> menuDishs;
 
-        public FormMenu(IMenuService service)
+        public FormMenu()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void LoadData()
         {
             try
             {
-                if (MenuDishs != null)
+                if (menuDishs != null)
                 {
                     dataGridView.DataSource = null;
-                    dataGridView.DataSource = MenuDishs;
+                    dataGridView.DataSource = menuDishs;
                     dataGridView.Columns[0].Visible = false;
                     dataGridView.Columns[1].Visible = false;
                     dataGridView.Columns[2].Visible = false;
@@ -54,13 +48,18 @@ namespace AbstractCafeView
             {
                 try
                 {
-                    MenuViewModel view = service.GetElement(id.Value);
-                    if (view != null)
+                    var response = APIClient.GetRequest("api/Menu/Get/" + id.Value);
+                    if (response.Result.IsSuccessStatusCode)
                     {
-                        textBoxName.Text = view.MenuName;
-                        textBoxPrice.Text = view.Price.ToString();
-                        MenuDishs = view.MenuDishs;
+                        var menu = APIClient.GetElement<MenuViewModel>(response);
+                        textBoxName.Text = menu.MenuName;
+                        textBoxPrice.Text = menu.Price.ToString();
+                        menuDishs = menu.MenuDishs;
                         LoadData();
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
                     }
                 }
                 catch (Exception ex)
@@ -70,13 +69,13 @@ namespace AbstractCafeView
             }
             else
             {
-                MenuDishs = new List<MenuDishViewModel>();
+                menuDishs = new List<MenuDishViewModel>();
             }
         }
 
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            var form = Container.Resolve<FormMenuDish>();
+            var form = new FormMenuDish();
             if (form.ShowDialog() == DialogResult.OK)
             {
                 if (form.Model != null)
@@ -85,7 +84,7 @@ namespace AbstractCafeView
                     {
                         form.Model.MenuId = id.Value;
                     }
-                    MenuDishs.Add(form.Model);
+                    menuDishs.Add(form.Model);
                 }
                 LoadData();
             }
@@ -95,11 +94,11 @@ namespace AbstractCafeView
         {
             if (dataGridView.SelectedRows.Count == 1)
             {
-                var form = Container.Resolve<FormMenuDish>();
-                form.Model = MenuDishs[dataGridView.SelectedRows[0].Cells[0].RowIndex];
+                var form = new FormMenuDish();
+                form.Model = menuDishs[dataGridView.SelectedRows[0].Cells[0].RowIndex];
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    MenuDishs[dataGridView.SelectedRows[0].Cells[0].RowIndex] = form.Model;
+                    menuDishs[dataGridView.SelectedRows[0].Cells[0].RowIndex] = form.Model;
                     LoadData();
                 }
             }
@@ -113,7 +112,7 @@ namespace AbstractCafeView
                 {
                     try
                     {
-                        MenuDishs.RemoveAt(dataGridView.SelectedRows[0].Cells[0].RowIndex);
+                        menuDishs.RemoveAt(dataGridView.SelectedRows[0].Cells[0].RowIndex);
                     }
                     catch (Exception ex)
                     {
@@ -141,46 +140,54 @@ namespace AbstractCafeView
                 MessageBox.Show("Заполните цену", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if (MenuDishs == null || MenuDishs.Count == 0)
+            if (menuDishs == null || menuDishs.Count == 0)
             {
                 MessageBox.Show("Заполните компоненты", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             try
             {
-                List<MenuDishBindingModel> MenuDishBM = new List<MenuDishBindingModel>();
-                for (int i = 0; i < MenuDishs.Count; ++i)
+                List<MenuDishBindingModel> menuDishBM = new List<MenuDishBindingModel>();
+                for (int i = 0; i < menuDishs.Count; ++i)
                 {
-                    MenuDishBM.Add(new MenuDishBindingModel
+                    menuDishBM.Add(new MenuDishBindingModel
                     {
-                        Id = MenuDishs[i].Id,
-                        MenuId = MenuDishs[i].MenuId,
-                        DishId = MenuDishs[i].DishId,
-                        Count = MenuDishs[i].Count
+                        Id = menuDishs[i].Id,
+                        MenuId = menuDishs[i].MenuId,
+                        DishId = menuDishs[i].DishId,
+                        Count = menuDishs[i].Count
                     });
                 }
+                Task<HttpResponseMessage> response;
                 if (id.HasValue)
                 {
-                    service.UpdElement(new MenuBindingModel
+                    response = APIClient.PostRequest("api/Menu/UpdElement", new MenuBindingModel
                     {
                         Id = id.Value,
                         MenuName = textBoxName.Text,
                         Price = Convert.ToInt32(textBoxPrice.Text),
-                        MenuDishs = MenuDishBM
+                        MenuDishs = menuDishBM
                     });
                 }
                 else
                 {
-                    service.AddElement(new MenuBindingModel
+                    response = APIClient.PostRequest("api/Menu/AddElement", new MenuBindingModel
                     {
                         MenuName = textBoxName.Text,
                         Price = Convert.ToInt32(textBoxPrice.Text),
-                        MenuDishs = MenuDishBM
+                        MenuDishs = menuDishBM
                     });
                 }
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

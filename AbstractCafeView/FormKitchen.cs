@@ -1,28 +1,21 @@
 ﻿using AbstractCafeService.BindingModel;
-using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace AbstractCafeView
 {
     public partial class FormKitchen : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
         public int Id { set { id = value; } }
-
-        private readonly IKitchenService service;
 
         private int? id;
 
-        public FormKitchen(IKitchenService service)
+        public FormKitchen()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormKitchen_Load(object sender, EventArgs e)
@@ -31,15 +24,20 @@ namespace AbstractCafeView
             {
                 try
                 {
-                    KitchenViewModel view = service.GetElement(id.Value);
-                    if (view != null)
+                    var response = APIClient.GetRequest("api/Kitchen/Get/" + id.Value);
+                    if (response.Result.IsSuccessStatusCode)
                     {
-                        textBoxName.Text = view.KitchenName;
-                        dataGridView.DataSource = view.KitchenDishs;
+                        var kitchen = APIClient.GetElement<KitchenViewModel>(response);
+                        textBoxName.Text = kitchen.KitchenName;
+                        dataGridView.DataSource = kitchen.KitchenDishs;
                         dataGridView.Columns[0].Visible = false;
                         dataGridView.Columns[1].Visible = false;
                         dataGridView.Columns[2].Visible = false;
                         dataGridView.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+                    else
+                    {
+                        throw new Exception(APIClient.GetError(response));
                     }
                 }
                 catch (Exception ex)
@@ -58,9 +56,10 @@ namespace AbstractCafeView
             }
             try
             {
+                Task<HttpResponseMessage> response;
                 if (id.HasValue)
                 {
-                    service.UpdElement(new KitchenBindingModel
+                    response = APIClient.PostRequest("api/Kitchen/UpdElement", new KitchenBindingModel
                     {
                         Id = id.Value,
                         KitchenName = textBoxName.Text
@@ -68,14 +67,21 @@ namespace AbstractCafeView
                 }
                 else
                 {
-                    service.AddElement(new KitchenBindingModel
+                    response = APIClient.PostRequest("api/Kitchen/AddElement", new KitchenBindingModel
                     {
                         KitchenName = textBoxName.Text
                     });
                 }
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

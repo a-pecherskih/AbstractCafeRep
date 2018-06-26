@@ -1,52 +1,53 @@
 ﻿using AbstractCafeService.BindingModel;
-using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace AbstractCafeView
 {
     public partial class FormPutInKitchen : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
-        private readonly IKitchenService serviceS;
-
-        private readonly IDishService serviceC;
-
-        private readonly IMainService serviceM;
-
-        public FormPutInKitchen(IKitchenService serviceS, IDishService serviceC, IMainService serviceM)
+        public FormPutInKitchen()
         {
             InitializeComponent();
-            this.serviceS = serviceS;
-            this.serviceC = serviceC;
-            this.serviceM = serviceM;
         }
 
         private void FormPutInKitchen_Load(object sender, EventArgs e)
         {
             try
             {
-                List<DishViewModel> listC = serviceC.GetList();
-                if (listC != null)
+                var responseC = APIClient.GetRequest("api/Dish/GetList");
+                if (responseC.Result.IsSuccessStatusCode)
                 {
-                    comboBoxDish.DisplayMember = "DishName";
-                    comboBoxDish.ValueMember = "Id";
-                    comboBoxDish.DataSource = listC;
-                    comboBoxDish.SelectedItem = null;
+                    List<DishViewModel> list = APIClient.GetElement<List<DishViewModel>>(responseC);
+                    if (list != null)
+                    {
+                        comboBoxDish.DisplayMember = "DishName";
+                        comboBoxDish.ValueMember = "Id";
+                        comboBoxDish.DataSource = list;
+                        comboBoxDish.SelectedItem = null;
+                    }
                 }
-                List<KitchenViewModel> listS = serviceS.GetList();
-                if (listS != null)
+                else
                 {
-                    comboBoxKitchen.DisplayMember = "KitchenName";
-                    comboBoxKitchen.ValueMember = "Id";
-                    comboBoxKitchen.DataSource = listS;
-                    comboBoxKitchen.SelectedItem = null;
+                    throw new Exception(APIClient.GetError(responseC));
+                }
+                var responseS = APIClient.GetRequest("api/Kitchen/GetList");
+                if (responseS.Result.IsSuccessStatusCode)
+                {
+                    List<KitchenViewModel> list = APIClient.GetElement<List<KitchenViewModel>>(responseS);
+                    if (list != null)
+                    {
+                        comboBoxKitchen.DisplayMember = "KitchenName";
+                        comboBoxKitchen.ValueMember = "Id";
+                        comboBoxKitchen.DataSource = list;
+                        comboBoxKitchen.SelectedItem = null;
+                    }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(responseC));
                 }
             }
             catch (Exception ex)
@@ -74,15 +75,22 @@ namespace AbstractCafeView
             }
             try
             {
-                serviceM.PutDishOnKitchen(new KitchenDishBindingModel
+                var response = APIClient.PostRequest("api/Main/PutDishOnKitchen", new KitchenDishBindingModel
                 {
                     DishId = Convert.ToInt32(comboBoxDish.SelectedValue),
                     KitchenId = Convert.ToInt32(comboBoxKitchen.SelectedValue),
                     Count = Convert.ToInt32(textBoxCount.Text)
                 });
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {

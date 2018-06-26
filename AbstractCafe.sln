@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractCafeService", "Abst
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractCafeView", "AbstractCafeView\AbstractCafeView.csproj", "{A0076B0C-3387-45DA-A731-773FA70DE28F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AbstractCafeRestApi", "AbstractCafeRestApi\AbstractCafeRestApi.csproj", "{74F174B3-9F09-4C31-B6C5-9BB796A0B7C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{A0076B0C-3387-45DA-A731-773FA70DE28F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0076B0C-3387-45DA-A731-773FA70DE28F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0076B0C-3387-45DA-A731-773FA70DE28F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74F174B3-9F09-4C31-B6C5-9BB796A0B7C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74F174B3-9F09-4C31-B6C5-9BB796A0B7C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74F174B3-9F09-4C31-B6C5-9BB796A0B7C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74F174B3-9F09-4C31-B6C5-9BB796A0B7C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

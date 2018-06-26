@@ -1,41 +1,36 @@
-﻿using AbstractCafeService.Interfaces;
-using AbstractCafeService.ViewModels;
+﻿using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace AbstractCafeView
 {
     public partial class FormMenuDish : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
         public MenuDishViewModel Model { set { model = value; } get { return model; } }
-
-        private readonly IDishService service;
 
         private MenuDishViewModel model;
 
-        public FormMenuDish(IDishService service)
+        public FormMenuDish()
         {
             InitializeComponent();
-            this.service = service;
         }
 
         private void FormMenuDish_Load(object sender, EventArgs e)
         {
             try
             {
-                List<DishViewModel> list = service.GetList();
-                if (list != null)
+                var response = APIClient.GetRequest("api/Dish/GetList");
+                if (response.Result.IsSuccessStatusCode)
                 {
                     comboBoxDish.DisplayMember = "DishName";
                     comboBoxDish.ValueMember = "Id";
-                    comboBoxDish.DataSource = list;
+                    comboBoxDish.DataSource = APIClient.GetElement<List<DishViewModel>>(response);
                     comboBoxDish.SelectedItem = null;
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)

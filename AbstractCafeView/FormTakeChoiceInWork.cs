@@ -1,32 +1,20 @@
 ﻿using AbstractCafeService.BindingModel;
-using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using Unity;
-using Unity.Attributes;
 
 namespace AbstractCafeView
 {
     public partial class FormTakeChoiceInWork : Form
     {
-        [Dependency]
-        public new IUnityContainer Container { get; set; }
-
         public int Id { set { id = value; } }
-
-        private readonly IChefService serviceI;
-
-        private readonly IMainService serviceM;
 
         private int? id;
 
-        public FormTakeChoiceInWork(IChefService serviceI, IMainService serviceM)
+        public FormTakeChoiceInWork()
         {
             InitializeComponent();
-            this.serviceI = serviceI;
-            this.serviceM = serviceM;
         }
 
         private void FormTakeChoiceInWork_Load(object sender, EventArgs e)
@@ -38,13 +26,21 @@ namespace AbstractCafeView
                     MessageBox.Show("Не указан заказ", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     Close();
                 }
-                List<ChefViewModel> listI = serviceI.GetList();
-                if (listI != null)
+                var response = APIClient.GetRequest("api/Chef/GetList");
+                if (response.Result.IsSuccessStatusCode)
                 {
-                    comboBoxChef.DisplayMember = "ChefFIO";
-                    comboBoxChef.ValueMember = "Id";
-                    comboBoxChef.DataSource = listI;
-                    comboBoxChef.SelectedItem = null;
+                    List<ChefViewModel> list = APIClient.GetElement<List<ChefViewModel>>(response);
+                    if (list != null)
+                    {
+                        comboBoxChef.DisplayMember = "ChefFIO";
+                        comboBoxChef.ValueMember = "Id";
+                        comboBoxChef.DataSource = list;
+                        comboBoxChef.SelectedItem = null;
+                    }
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
                 }
             }
             catch (Exception ex)
@@ -62,14 +58,21 @@ namespace AbstractCafeView
             }
             try
             {
-                serviceM.TakeChoiceInWork(new ChoiceBindingModel
+                var response = APIClient.PostRequest("api/Main/TakeChoiceInWork", new ChoiceBindingModel
                 {
                     Id = id.Value,
                     ChefId = Convert.ToInt32(comboBoxChef.SelectedValue)
                 });
-                MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                DialogResult = DialogResult.OK;
-                Close();
+                if (response.Result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    DialogResult = DialogResult.OK;
+                    Close();
+                }
+                else
+                {
+                    throw new Exception(APIClient.GetError(response));
+                }
             }
             catch (Exception ex)
             {
