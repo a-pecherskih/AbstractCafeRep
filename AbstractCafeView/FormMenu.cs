@@ -1,9 +1,7 @@
 ﻿using AbstractCafeService.BindingModel;
-using AbstractCafeService.Interfaces;
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -47,23 +45,19 @@ namespace AbstractCafeView
             if (id.HasValue)
             {
                 try
-                {
-                    var response = APIClient.GetRequest("api/Menu/Get/" + id.Value);
-                    if (response.Result.IsSuccessStatusCode)
-                    {
-                        var menu = APIClient.GetElement<MenuViewModel>(response);
-                        textBoxName.Text = menu.MenuName;
-                        textBoxPrice.Text = menu.Price.ToString();
-                        menuDishs = menu.MenuDishs;
-                        LoadData();
-                    }
-                    else
-                    {
-                        throw new Exception(APIClient.GetError(response));
-                    }
+                { 
+                    var menu = Task.Run(() => APIClient.GetRequestData<MenuViewModel>("api/Menu/Get/" + id.Value)).Result;
+                    textBoxName.Text = menu.MenuName;
+                    textBoxPrice.Text = menu.Price.ToString();
+                    menuDishs = menu.MenuDishs;
+                    LoadData();
                 }
                 catch (Exception ex)
                 {
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                    }
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -145,59 +139,58 @@ namespace AbstractCafeView
                 MessageBox.Show("Заполните компоненты", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            try
+
+            List<MenuDishBindingModel> menuDishBM = new List<MenuDishBindingModel>();
+            for (int i = 0; i < menuDishs.Count; ++i)
             {
-                List<MenuDishBindingModel> menuDishBM = new List<MenuDishBindingModel>();
-                for (int i = 0; i < menuDishs.Count; ++i)
+                menuDishBM.Add(new MenuDishBindingModel
                 {
-                    menuDishBM.Add(new MenuDishBindingModel
-                    {
-                        Id = menuDishs[i].Id,
-                        MenuId = menuDishs[i].MenuId,
-                        DishId = menuDishs[i].DishId,
-                        Count = menuDishs[i].Count
-                    });
-                }
-                Task<HttpResponseMessage> response;
-                if (id.HasValue)
-                {
-                    response = APIClient.PostRequest("api/Menu/UpdElement", new MenuBindingModel
-                    {
-                        Id = id.Value,
-                        MenuName = textBoxName.Text,
-                        Price = Convert.ToInt32(textBoxPrice.Text),
-                        MenuDishs = menuDishBM
-                    });
-                }
-                else
-                {
-                    response = APIClient.PostRequest("api/Menu/AddElement", new MenuBindingModel
-                    {
-                        MenuName = textBoxName.Text,
-                        Price = Convert.ToInt32(textBoxPrice.Text),
-                        MenuDishs = menuDishBM
-                    });
-                }
-                if (response.Result.IsSuccessStatusCode)
-                {
-                    MessageBox.Show("Сохранение прошло успешно", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    DialogResult = DialogResult.OK;
-                    Close();
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(response));
-                }
+                    Id = menuDishs[i].Id,
+                    MenuId = menuDishs[i].MenuId,
+                    DishId = menuDishs[i].DishId,
+                    Count = menuDishs[i].Count
+                });
             }
-            catch (Exception ex)
+            string name = textBoxName.Text;
+            int price = Convert.ToInt32(textBoxPrice.Text);
+            Task task;
+            if (id.HasValue)
             {
+                task = Task.Run(() => APIClient.PostRequestData("api/Menu/UpdElement", new MenuBindingModel
+                {
+                    Id = id.Value,
+                    MenuName = name,
+                    Price = price,
+                    MenuDishs = menuDishBM
+                }));
+            }
+            else
+            {
+                task = Task.Run(() => APIClient.PostRequestData("api/Menu/AddElement", new MenuBindingModel
+                {
+                    MenuName = name,
+                    Price = price,
+                    MenuDishs = menuDishBM
+                }));
+            }
+
+            task.ContinueWith((prevTask) => MessageBox.Show("Сохранение прошло успешно. Обновите список", "Сообщение", MessageBoxButtons.OK, MessageBoxIcon.Information),
+                TaskContinuationOptions.OnlyOnRanToCompletion);
+            task.ContinueWith((prevTask) =>
+            {
+                var ex = (Exception)prevTask.Exception;
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }, TaskContinuationOptions.OnlyOnFaulted);
+
+            Close();
         }
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.Cancel;
             Close();
         }
     }

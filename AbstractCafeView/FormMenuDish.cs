@@ -1,6 +1,7 @@
 ﻿using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AbstractCafeView
@@ -20,21 +21,18 @@ namespace AbstractCafeView
         {
             try
             {
-                var response = APIClient.GetRequest("api/Dish/GetList");
-                if (response.Result.IsSuccessStatusCode)
-                {
-                    comboBoxDish.DisplayMember = "DishName";
-                    comboBoxDish.ValueMember = "Id";
-                    comboBoxDish.DataSource = APIClient.GetElement<List<DishViewModel>>(response);
-                    comboBoxDish.SelectedItem = null;
-                }
-                else
-                {
-                    throw new Exception(APIClient.GetError(response));
-                }
+                comboBoxDish.DisplayMember = "DishName";
+                comboBoxDish.ValueMember = "Id";
+                comboBoxDish.DataSource = Task.Run(() => APIClient.GetRequestData<List<DishViewModel>>("api/Dish/GetList")).Result;
+                comboBoxDish.SelectedItem = null;
+
             }
             catch (Exception ex)
             {
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             if (model != null)

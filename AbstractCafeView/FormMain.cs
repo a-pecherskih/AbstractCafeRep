@@ -2,6 +2,7 @@
 using AbstractCafeService.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AbstractCafeView
@@ -17,28 +18,23 @@ namespace AbstractCafeView
         {
             try
             {
-                var response = APIClient.GetRequest("api/Main/GetList");
-                if (response.Result.IsSuccessStatusCode)
+                List<ChoiceViewModel> list = Task.Run(() => APIClient.GetRequestData<List<ChoiceViewModel>>("api/Main/GetList")).Result;
+                if (list != null)
                 {
-                    List<ChoiceViewModel> list = APIClient.GetElement<List<ChoiceViewModel>>(response);
-                    if (list != null)
-                    {
-                        dataGridView.DataSource = list;
-                        dataGridView.Columns[0].Visible = false;
-                        dataGridView.Columns[1].Visible = false;
-                        dataGridView.Columns[3].Visible = false;
-                        dataGridView.Columns[5].Visible = false;
-                        dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    }
-                    else
-                    {
-                        throw new Exception(APIClient.GetError(response));
-                    }
-
+                    dataGridView.DataSource = list;
+                    dataGridView.Columns[0].Visible = false;
+                    dataGridView.Columns[1].Visible = false;
+                    dataGridView.Columns[3].Visible = false;
+                    dataGridView.Columns[5].Visible = false;
+                    dataGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 }
             }
             catch (Exception ex)
             {
+                while (ex.InnerException != null)
+                {
+                    ex = ex.InnerException;
+                }
                 MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -83,7 +79,6 @@ namespace AbstractCafeView
         {
             var form = new FormCreateChoice();
             form.ShowDialog();
-            LoadData();
         }
 
         private void buttonTakeChoiceInWork_Click(object sender, EventArgs e)
@@ -95,7 +90,6 @@ namespace AbstractCafeView
                     Id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value)
                 };
                 form.ShowDialog();
-                LoadData();
             }
         }
 
@@ -104,25 +98,24 @@ namespace AbstractCafeView
             if (dataGridView.SelectedRows.Count == 1)
             {
                 int id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
-                try
+
+                Task task = Task.Run(() => APIClient.PostRequestData("api/Main/FinishChoice", new ChoiceBindingModel
                 {
-                    var response = APIClient.PostRequest("api/Main/FinishChoice", new ChoiceBindingModel
-                    {
-                        Id = id
-                    });
-                    if (response.Result.IsSuccessStatusCode)
-                    {
-                        LoadData();
-                    }
-                    else
-                    {
-                        throw new Exception(APIClient.GetError(response));
-                    }
-                }
-                catch (Exception ex)
+                    Id = id
+                }));
+
+                task.ContinueWith((prevTask) => MessageBox.Show("Статус заказа изменен. Обновите список", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information),
+                TaskContinuationOptions.OnlyOnRanToCompletion);
+
+                task.ContinueWith((prevTask) =>
                 {
+                    var ex = (Exception)prevTask.Exception;
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                    }
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                }, TaskContinuationOptions.OnlyOnFaulted);
             }
         }
 
@@ -131,25 +124,24 @@ namespace AbstractCafeView
             if (dataGridView.SelectedRows.Count == 1)
             {
                 int id = Convert.ToInt32(dataGridView.SelectedRows[0].Cells[0].Value);
-                try
+
+                Task task = Task.Run(() => APIClient.PostRequestData("api/Main/PayChoice", new ChoiceBindingModel
                 {
-                    var response = APIClient.PostRequest("api/Main/PayChoice", new ChoiceBindingModel
-                    {
-                        Id = id
-                    });
-                    if (response.Result.IsSuccessStatusCode)
-                    {
-                        LoadData();
-                    }
-                    else
-                    {
-                        throw new Exception(APIClient.GetError(response));
-                    }
-                }
-                catch (Exception ex)
+                    Id = id
+                }));
+
+                task.ContinueWith((prevTask) => MessageBox.Show("Статус заказа изменен. Обновите список", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information),
+                TaskContinuationOptions.OnlyOnRanToCompletion);
+
+                task.ContinueWith((prevTask) =>
                 {
+                    var ex = (Exception)prevTask.Exception;
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                    }
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                }, TaskContinuationOptions.OnlyOnFaulted);
             }
         }
 
@@ -166,25 +158,24 @@ namespace AbstractCafeView
             };
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                try
+                string fileName = sfd.FileName;
+                Task task = Task.Run(() => APIClient.PostRequestData("api/Report/SaveMenuPrice", new ReportBindingModel
                 {
-                    var response = APIClient.PostRequest("api/Report/SaveMenuPrice", new ReportBindingModel
-                    {
-                        FileName = sfd.FileName
-                    });
-                    if (response.Result.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        throw new Exception(APIClient.GetError(response));
-                    }
-                }
-                catch (Exception ex)
+                    FileName = fileName
+                }));
+
+                task.ContinueWith((prevTask) => MessageBox.Show("Выполнено", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information),
+                TaskContinuationOptions.OnlyOnRanToCompletion);
+
+                task.ContinueWith((prevTask) =>
                 {
+                    var ex = (Exception)prevTask.Exception;
+                    while (ex.InnerException != null)
+                    {
+                        ex = ex.InnerException;
+                    }
                     MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                }, TaskContinuationOptions.OnlyOnFaulted);
             }
         }
 
