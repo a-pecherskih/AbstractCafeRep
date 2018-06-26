@@ -1,0 +1,20 @@
+﻿<Window x:Class="WpfAbstractCafe.PutInKitchenWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfAbstractCafe"
+        mc:Ignorable="d"
+        Title="Добавить блюдо на кухню" Height="217.583" Width="398.901">
+    <Grid>
+        <Label Content="Кухня:" HorizontalAlignment="Left" Margin="18,13,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.338,0.052"/>
+        <ComboBox x:Name="comboBoxKitchen" HorizontalAlignment="Left" Margin="100,17,0,0" VerticalAlignment="Top" Width="232"/>
+        <Label Content="Блюдо:" HorizontalAlignment="Left" Margin="18,54,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.338,0.052"/>
+        <ComboBox x:Name="comboBoxDish" HorizontalAlignment="Left" Margin="100,58,0,0" VerticalAlignment="Top" Width="232"/>
+        <Label Content="Количество: " HorizontalAlignment="Left" Margin="18,103,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.338,0.052"/>
+        <TextBox x:Name="textBoxCount" HorizontalAlignment="Left" Height="23" Margin="100,103,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="232"/>
+        <Button x:Name="buttonSave" Content="Сохранить" HorizontalAlignment="Left" Margin="159,146,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.17,-0.082" Click="buttonSave_Click"/>
+        <Button x:Name="buttonCancel" Content="Отмена" HorizontalAlignment="Left" Margin="257,146,0,0" VerticalAlignment="Top" Width="75" Click="buttonCancel_Click"/>
+
+    </Grid>
+</Window>
